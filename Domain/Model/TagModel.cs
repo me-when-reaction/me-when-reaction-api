@@ -5,7 +5,7 @@ using MeWhen.Domain.Constant;
 namespace MeWhen.Domain.Model
 {
     [Table("tr_tag")]
-    public class Tag : BaseModel
+    public class TagModel : BaseModel
     {
         [Column("name", TypeName = "text")]
         public required string Name { get; set; }
@@ -14,7 +14,7 @@ namespace MeWhen.Domain.Model
         public required ModelConstant.AgeRating AgeRating { get; set; }
 
         [NotMapped]
-        [InverseProperty(nameof(ImageTag.Tag))]
-        public List<ImageTag> TagsUsed { get; set; } = [];
+        [InverseProperty(nameof(ImageTagModel.Tag))]
+        public List<ImageTagModel> TagsUsed { get; set; } = [];
     }
 }

@@ -15,6 +15,8 @@ internal class Program
         });
         Config = builder.Configuration;
 
+        ImportScript.Import();
+
         // var app = builder.Build();
 
         // app.MapGet("/", () => "Hello World!");

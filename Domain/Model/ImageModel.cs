@@ -8,7 +8,7 @@ using NpgsqlTypes;
 namespace MeWhen.Domain.Model
 {
     [Table("tr_image")]
-    public class Image : BaseModel
+    public class ImageModel : BaseModel
     {
         [Column("name", TypeName = "text")]
         public required string Name { get; set; }
@@ -29,7 +29,7 @@ namespace MeWhen.Domain.Model
         public required ModelConstant.AgeRating AgeRating { get; set; }
 
         [NotMapped]
-        [InverseProperty(nameof(ImageTag.Image))]
-        public List<ImageTag> Tags { get; set; } = [];
+        [InverseProperty(nameof(ImageTagModel.Image))]
+        public List<ImageTagModel> Tags { get; set; } = [];
     }
 }

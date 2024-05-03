@@ -1,7 +1,9 @@
 using System;
 using ClosedXML.Excel;
+using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 
@@ -14,6 +16,7 @@ namespace MeWhen.Import
             public Guid ID { get; set; }
             public required string Name { get; set; }
             public required string Tags { get; set; }
+            public List<string> TagsList => [..Tags.Split(" ")];
         }
 
         public static void Import()
@@ -36,12 +39,25 @@ namespace MeWhen.Import
                 data.Add(d);
             }
 
-            // ctx.Set<Image>().AddRange(data.Select(d => new Image()
+            var a = string.Join("\n", data.SelectMany(x => x.TagsList)
+                .Distinct());
+
+            var tagsList = data.SelectMany(x => x.TagsList)
+                .Distinct()
+                .ToDictionary(k => k, v => Guid.NewGuid());
+
+            // ctx.Set<ImageModel>().AddRange(data.Select(d => new Image()
             // {
             //     ID = d.ID,
             //     Name = d.Name,
             //     Tags = [.. d.Tags.Split(" ")],
             //     TagString = d.Tags
+            // }));
+
+            // ctx.Set<TagModel>().AddRange(tagsList.Select(x => new TagModel(){
+            //     AgeRating = ModelConstant.AgeRating.GENERAL,
+            //     Name = x.Key,
+            //     ID = x.Value
             // }));
 
             // ctx.SaveChanges();

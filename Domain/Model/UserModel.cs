@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace MeWhen.Domain.Model
 {
     [Table("ms_user")]
-    public class User : BaseModel
+    public class UserModel : BaseModel
     {
         [Column("name", TypeName = "text")]
         public required string Name { get; set; }
