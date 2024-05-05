@@ -3,64 +3,85 @@ using ClosedXML.Excel;
 using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using MeWhen.Infrastructure.Helper;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
+using static MeWhen.Domain.Constant.ModelConstant;
 
 namespace MeWhen.Import
 {
     public static class ImportScript
     {
-        public class TempData
-        {
-            public Guid ID { get; set; }
-            public required string Name { get; set; }
-            public required string Tags { get; set; }
-            public List<string> TagsList => [..Tags.Split(" ")];
-        }
-
         public static void Import()
         {
-            var worksheet = new XLWorkbook("./me-when.xlsx").Worksheet(1);
-            List<TempData> data = [];
+            var workBook = new XLWorkbook("./me-when.xlsx");
             var ctx = new MeWhenDBContext(new DbContextOptionsBuilder<MeWhenDBContext>()
                 .UseNpgsql(Program.Config.GetConnectionString("Default")).Options);
 
+            List<ImageModel> image = [];
+            List<ImageTagModel> imageTag = [];
+            List<TagModel> tag = [];
+
             var rowIndex = 2;
+            var worksheet = workBook.Worksheet(1);
             while(!worksheet.Cell(rowIndex, 1).IsEmpty())
             {
                 var row = worksheet.Row(rowIndex++);
-                var d = new TempData()
+                image.Add(new ImageModel()
                 {
-                    ID = new(row.Cell(1).CachedValue.GetText()),
+                    ID = row.Cell(1).CachedValue.GetText().ToGUID(),
                     Name = row.Cell(2).CachedValue.GetText(),
-                    Tags = row.Cell(6).CachedValue.GetText()
-                };
-                data.Add(d);
+                    Link = row.Cell(3).IsEmpty() ? "" : row.Cell(3).CachedValue.GetText(),
+                    Description = row.Cell(4).CachedValue.GetText(),
+                    Source = row.Cell(5).IsEmpty() ? "" : row.Cell(5).CachedValue.GetText(),
+                    AgeRating = row.Cell(7).CachedValue.GetText() switch
+                    {
+                        "MATURE" => AgeRating.MATURE,
+                        "EXPLICIT" => AgeRating.EXPLICIT,
+                        _ => AgeRating.GENERAL,
+                    },
+                    UploadDate = DateTime.Now.SpecifyKind(),
+                });
             }
 
-            var a = string.Join("\n", data.SelectMany(x => x.TagsList)
-                .Distinct());
+            rowIndex = 2;
+            worksheet = workBook.Worksheet(3);
+            while(!worksheet.Cell(rowIndex, 1).IsEmpty())
+            {
+                var row = worksheet.Row(rowIndex++);
+                tag.Add(new TagModel()
+                {
+                    ID = row.Cell(1).CachedValue.GetText().ToGUID(),
+                    Name = row.Cell(2).CachedValue.GetText(),
+                    AgeRating = row.Cell(3).CachedValue.GetText() switch
+                    {
+                        "MATURE" => AgeRating.MATURE,
+                        "EXPLICIT" => AgeRating.EXPLICIT,
+                        _ => AgeRating.GENERAL,
+                    }
+                });
+            }
 
-            var tagsList = data.SelectMany(x => x.TagsList)
-                .Distinct()
-                .ToDictionary(k => k, v => Guid.NewGuid());
+            rowIndex = 2;
+            worksheet = workBook.Worksheet(2);
+            while(!worksheet.Cell(rowIndex, 1).IsEmpty())
+            {
+                var row = worksheet.Row(rowIndex++);
+                imageTag.Add(new ImageTagModel()
+                {
+                    ID = row.Cell(1).CachedValue.GetText().ToGUID(),
+                    ImageID = row.Cell(2).CachedValue.GetText().ToGUID(),
+                    TagID = row.Cell(4).CachedValue.GetText().ToGUID()
+                });
+            }
 
-            // ctx.Set<ImageModel>().AddRange(data.Select(d => new Image()
-            // {
-            //     ID = d.ID,
-            //     Name = d.Name,
-            //     Tags = [.. d.Tags.Split(" ")],
-            //     TagString = d.Tags
-            // }));
+            ctx.Set<ImageModel>().AddRange(image);
+            ctx.Set<TagModel>().AddRange(tag);
+            ctx.Set<ImageTagModel>().AddRange(imageTag);
 
-            // ctx.Set<TagModel>().AddRange(tagsList.Select(x => new TagModel(){
-            //     AgeRating = ModelConstant.AgeRating.GENERAL,
-            //     Name = x.Key,
-            //     ID = x.Value
-            // }));
-
-            // ctx.SaveChanges();
+            ctx.SaveChanges();
         }
     }
 }

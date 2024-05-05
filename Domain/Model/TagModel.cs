@@ -13,8 +13,7 @@ namespace MeWhen.Domain.Model
         [Column("age_rating")]
         public required ModelConstant.AgeRating AgeRating { get; set; }
 
-        [NotMapped]
-        [InverseProperty(nameof(ImageTagModel.Tag))]
+        [InverseProperty("Tag")]
         public List<ImageTagModel> TagsUsed { get; set; } = [];
     }
 }

@@ -13,16 +13,23 @@ internal class Program
         {
             opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
         });
+
+        builder.Services.AddControllers();
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen();
+        builder.Services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+        });
+
         Config = builder.Configuration;
+        var app = builder.Build();
 
-        ImportScript.Import();
-
-        // var app = builder.Build();
-
-        // app.MapGet("/", () => "Hello World!");
+        app.UseSwagger().UseSwaggerUI();
+        app.MapControllers();
 
         // ImportScript.Import();
-        // app.Run();
+        app.Run();
     }
 }
 
