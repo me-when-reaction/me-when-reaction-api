@@ -5,13 +5,18 @@ using System.Threading.Tasks;
 using MediatR;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeWhen.Service.Image
 {
     public class GetImageQuery : IRequest<List<GetImageQueryResponse>>
     {
-        public List<string> Tag { get; set; } = [];
+        public List<string> TagAND { get; set; } = [];
+        public List<string> TagOR { get; set; } = [];
+
+        [BindNever]
+        public List<string> JoinedTag => TagAND.Union(TagOR).ToList();
     }
 
     public class GetImageQueryResponse
@@ -23,14 +28,22 @@ namespace MeWhen.Service.Image
     public class GetImageQueryHandler(MeWhenDBContext _DB) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
     {
         public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
-        {
-            return (await _DB.Set<ImageModel>()
-                .ToListAsync(cancellationToken: cancellationToken))
-                .Select(x => new GetImageQueryResponse()
+            => await (
+                from i in _DB.Set<ImageModel>()
+                    .Include(x => x.Tags)
+                    .ThenInclude(y => y.Tag)
+                let tags = i.Tags.Select(x => x.Tag.Name)
+                where 
+                    request.JoinedTag.Count == 0 ||
+                    (
+                        (request.TagAND.Count == 0 || request.TagAND.All(x => tags.Any(y => y == x))) &&
+                        (request.TagOR.Count == 0 ||request.TagOR.Any(x => tags.Any(y => y == x)))
+                    )
+                select new GetImageQueryResponse()
                 {
-                    Name = x.Name,
-                    Tags = []
-                }).ToList();
-        }
+                    Name = i.Name,
+                    Tags = i.Tags.Select(x => x.Tag.Name).ToList()
+                }
+            ).ToListAsync(cancellationToken: cancellationToken);
     }
 }

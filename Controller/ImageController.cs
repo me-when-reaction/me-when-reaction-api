@@ -13,6 +13,6 @@ namespace MeWhen.Controller
     {
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] GetImageQuery data) =>
-            Data200(await mediator.Send(data));
+            await Run(async () => Data200(await mediator.Send(data)));
     }
 }

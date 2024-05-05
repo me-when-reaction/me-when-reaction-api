@@ -13,11 +13,9 @@ namespace MeWhen.Domain.Model
         [Column("tag_id")]
         public Guid TagID { get; set; }
 
-        [NotMapped]
         [ForeignKey(nameof(TagID))]
         public TagModel Tag { get; set; } = default!;
 
-        [NotMapped]
         [ForeignKey(nameof(ImageID))]
         public ImageModel Image { get; set; } = default!;
     }

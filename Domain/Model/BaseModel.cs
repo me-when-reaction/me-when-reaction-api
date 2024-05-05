@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using MeWhen.Infrastructure.Helper;
 
 namespace MeWhen.Domain.Model
 {
@@ -8,10 +9,10 @@ namespace MeWhen.Domain.Model
     {
         [Key]
         [Column("id")]
-        public Guid ID { get; set; }
+        public Guid ID { get; set; } = Guid.NewGuid();
 
         [Column("date_in")]
-        public DateTime DateIn { get; set; } = DateTime.Now;
+        public DateTime DateIn { get; set; } = DateTime.Now.SpecifyKind();
 
         [Column("date_up")]
         public DateTime? DateUp { get; set; }
@@ -20,7 +21,7 @@ namespace MeWhen.Domain.Model
         public DateTime? DateDel { get; set; }
 
         [Column("user_in")]
-        public Guid UserIn { get; set; }
+        public Guid UserIn { get; set; } = Guid.Empty;
 
         [Column("user_up")]
         public Guid? UserUp { get; set; }
