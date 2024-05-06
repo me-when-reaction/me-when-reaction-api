@@ -23,5 +23,22 @@ namespace MeWhen.Infrastructure.Context
                 builder.Entity(m).ToTable(m.GetCustomAttribute<TableAttribute>()!.Name);
             }
         }
+
+        public async Task Transaction(Func<MeWhenDBContext, Task> process)
+        {
+            await Database.CreateExecutionStrategy().ExecuteAsync(async () => {
+                var transaction = await Database.BeginTransactionAsync();
+                try
+                {
+                    await process(this);
+                    await transaction.CommitAsync();
+                }
+                catch
+                {
+                    await transaction.RollbackAsync();
+                    throw;
+                }
+            });
+        }
     }
 }

@@ -28,8 +28,8 @@ internal class Program
         app.UseSwagger().UseSwaggerUI();
         app.MapControllers();
 
-        // ImportScript.Import();
-        app.Run();
+        ImportScript.Import();
+        // app.Run();
     }
 }
 
