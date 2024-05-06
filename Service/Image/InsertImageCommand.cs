@@ -40,6 +40,7 @@ namespace MeWhen.Service.Image
                 UploadDate = DateTime.Now.SpecifyKind(),
                 AgeRating = Domain.Constant.ModelConstant.AgeRating.GENERAL,
                 ID = imageID,
+                Extension = "",
                 Description = "",
                 Link = "",
                 Source = ""

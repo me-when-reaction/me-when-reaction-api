@@ -54,6 +54,11 @@ namespace MeWhen.Infrastructure.MigrationHistory
                         .HasColumnType("text")
                         .HasColumnName("description");
 
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("extension");
+
                     b.Property<string>("Link")
                         .IsRequired()
                         .HasColumnType("text")

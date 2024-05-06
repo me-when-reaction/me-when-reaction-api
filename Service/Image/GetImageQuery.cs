@@ -22,28 +22,34 @@ namespace MeWhen.Service.Image
     public class GetImageQueryResponse
     {
         public required string Name { get; set; }
+        public required string Link { get; set; }
         public required List<string> Tags { get; set; }
     }
 
-    public class GetImageQueryHandler(MeWhenDBContext _DB) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
+    public class GetImageQueryHandler(MeWhenDBContext _DB, IConfiguration _Config) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
     {
         public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
-            => await (
+        {
+            var link = _Config.GetValue<string>("TempPath");
+
+            return await (
                 from i in _DB.Set<ImageModel>()
                     .Include(x => x.Tags)
                     .ThenInclude(y => y.Tag)
                 let tags = i.Tags.Select(x => x.Tag.Name)
-                where 
+                where
                     request.JoinedTag.Count == 0 ||
                     (
                         (request.TagAND.Count == 0 || request.TagAND.All(x => tags.Any(y => y == x))) &&
-                        (request.TagOR.Count == 0 ||request.TagOR.Any(x => tags.Any(y => y == x)))
+                        (request.TagOR.Count == 0 || request.TagOR.Any(x => tags.Any(y => y == x)))
                     )
                 select new GetImageQueryResponse()
                 {
                     Name = i.Name,
+                    Link = $"{link}/{i.Link}.{i.Extension}",
                     Tags = i.Tags.Select(x => x.Tag.Name).ToList()
                 }
             ).ToListAsync(cancellationToken: cancellationToken);
+        }
     }
 }
