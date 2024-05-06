@@ -43,6 +43,7 @@ namespace MeWhen.Infrastructure.MigrationHistory
                     link = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     source = table.Column<string>(type: "text", nullable: false),
+                    extension = table.Column<string>(type: "text", nullable: false),
                     upload_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     age_rating = table.Column<int>(type: "integer", nullable: false),
                     date_in = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),

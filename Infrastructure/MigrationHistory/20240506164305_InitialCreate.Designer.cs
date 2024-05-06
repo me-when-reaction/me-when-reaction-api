@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeWhen.Infrastructure.MigrationHistory
 {
     [DbContext(typeof(MeWhenDBContext))]
-    [Migration("20240505104126_InitialCreate")]
+    [Migration("20240506164305_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -56,6 +56,11 @@ namespace MeWhen.Infrastructure.MigrationHistory
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
+
+                    b.Property<string>("Extension")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("extension");
 
                     b.Property<string>("Link")
                         .IsRequired()

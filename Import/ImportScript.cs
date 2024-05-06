@@ -14,11 +14,19 @@ namespace MeWhen.Import
 {
     public static class ImportScript
     {
-        public static void Import()
+        public static async void Import()
         {
+            // reset data
+
             var workBook = new XLWorkbook("./me-when.xlsx");
             var ctx = new MeWhenDBContext(new DbContextOptionsBuilder<MeWhenDBContext>()
                 .UseNpgsql(Program.Config.GetConnectionString("Default")).Options);
+            
+            ctx.Set<ImageTagModel>().ExecuteDelete();
+            ctx.Set<ImageModel>().ExecuteDelete();
+            ctx.Set<TagModel>().ExecuteDelete();
+
+            ctx.SaveChanges();
 
             List<ImageModel> image = [];
             List<ImageTagModel> imageTag = [];
@@ -34,9 +42,10 @@ namespace MeWhen.Import
                     ID = row.Cell(1).CachedValue.GetText().ToGUID(),
                     Name = row.Cell(2).CachedValue.GetText(),
                     Link = row.Cell(3).IsEmpty() ? "" : row.Cell(3).CachedValue.GetText(),
-                    Description = row.Cell(4).CachedValue.GetText(),
-                    Source = row.Cell(5).IsEmpty() ? "" : row.Cell(5).CachedValue.GetText(),
-                    AgeRating = row.Cell(7).CachedValue.GetText() switch
+                    Extension = row.Cell(4).CachedValue.GetText(),
+                    Description = row.Cell(5).CachedValue.GetText(),
+                    Source = row.Cell(6).IsEmpty() ? "" : row.Cell(5).CachedValue.GetText(),
+                    AgeRating = row.Cell(8).CachedValue.GetText() switch
                     {
                         "MATURE" => AgeRating.MATURE,
                         "EXPLICIT" => AgeRating.EXPLICIT,

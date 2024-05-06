@@ -22,6 +22,9 @@ namespace MeWhen.Domain.Model
         [Column("source", TypeName = "text")]
         public required string Source { get; set; }
 
+        [Column("extension", TypeName = "text")]
+        public required string Extension { get; set; }
+
         [Column("upload_date")]
         public required DateTime UploadDate { get; set; }
 
