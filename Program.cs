@@ -1,6 +1,7 @@
 using MeWhen.Import;
 using MeWhen.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 internal class Program
 {
@@ -11,10 +12,12 @@ internal class Program
         var builder = WebApplication.CreateBuilder(args);
         builder.Services.AddDbContext<MeWhenDBContext>(opt =>
         {
-            opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
+            opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
+                .EnableSensitiveDataLogging(true);
         });
 
         builder.Services.AddControllers();
+        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         builder.Services.AddMediatR(config =>
@@ -28,8 +31,8 @@ internal class Program
         app.UseSwagger().UseSwaggerUI();
         app.MapControllers();
 
-        ImportScript.Import();
-        // app.Run();
+        // ImportScript.Import();
+        app.Run();
     }
 }
 
