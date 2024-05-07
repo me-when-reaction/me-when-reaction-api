@@ -4,7 +4,7 @@ using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Service.Tag
+namespace MeWhen.Service.App.Tag
 {
     public class GetTagSuggestionQuery : IRequest<List<GetTagSuggestionResponse>>
     {

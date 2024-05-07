@@ -8,7 +8,7 @@ using MeWhen.Infrastructure.Context;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Service.Image
+namespace MeWhen.Service.App.Image
 {
     public class GetImageQuery : IRequest<List<GetImageQueryResponse>>
     {
@@ -46,7 +46,7 @@ namespace MeWhen.Service.Image
                 select new GetImageQueryResponse()
                 {
                     Name = i.Name,
-                    Link = $"{link}/{i.Link}.{i.Extension}",
+                    Link = $"{link}/{i.ID}.{i.Extension}",
                     Tags = i.Tags.Select(x => x.Tag.Name).ToList()
                 }
             ).ToListAsync(cancellationToken: cancellationToken);

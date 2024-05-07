@@ -1,6 +1,6 @@
 using System;
 using MediatR;
-using MeWhen.Service.Tag;
+using MeWhen.Service.App.Tag;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeWhen.Controller

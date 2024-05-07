@@ -6,7 +6,7 @@ using MediatR;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
 
-namespace MeWhen.Service.Tag
+namespace MeWhen.Service.App.Tag
 {
     public class InsertTagCommand : IRequest
     {
