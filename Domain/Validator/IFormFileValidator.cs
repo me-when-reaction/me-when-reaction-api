@@ -15,15 +15,15 @@ namespace MeWhen.Domain.Validator
             var extension = FileConstant.Extension.Select(x => x.Value);
 
             RuleFor(x => x.Length).LessThanOrEqualTo(FileConstant.MAX_SIZE)
-                .WithMessage($"File size must be less than {FileConstant.MAX_SIZE / 1024} MB");
-            
-            RuleFor(x => x.FileName).Must(fileName => extension.Contains(Path.GetExtension(fileName)))
-                .WithMessage($"File format must be ${string.Join(", ", extension)}");
-            
+                .WithMessage($"File size must be less than {FileConstant.MAX_SIZE / 1024 / 1024} MB");
+
             RuleFor(x => x.OpenReadStream())
-                .Must(stream => {
+                .Must((obj, stream) => {
                     if (stream.Length == 0 || !FileTypeValidator.IsTypeRecognizable(stream)) return false;
-                    return extension.Contains(FileTypeValidator.GetFileType(stream).Extension) && FileTypeValidator.IsImage(stream);
+                    return 
+                        extension.Contains(FileTypeValidator.GetFileType(stream).Extension)
+                        && FileTypeValidator.IsImage(stream)
+                        && extension.Contains(Path.GetExtension(obj.FileName)[1..]);
                 })
                 .WithMessage($"File format must be ${string.Join(", ", extension)}");
         }

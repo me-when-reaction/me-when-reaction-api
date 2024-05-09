@@ -2,6 +2,10 @@ using MeWhen.Import;
 using MeWhen.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
+using Microsoft.OpenApi.Models;
+using System.Text.Json.Serialization;
+using MediatR;
+using MeWhen.Service.Pipe;
 
 internal class Program
 {
@@ -16,14 +20,22 @@ internal class Program
                 .EnableSensitiveDataLogging(true);
         });
 
-        builder.Services.AddControllers();
-        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-        builder.Services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-        });
+        builder.Services.AddControllers()
+            .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+        
+        builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly)
+            .AddEndpointsApiExplorer()
+            .AddSwaggerGen(config => {
+                config.SwaggerDoc("v1", new OpenApiInfo(){
+                    Title = "Me When API",
+                    Version = "v1"
+                });
+            })
+            .AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+                builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
+            });
 
         Config = builder.Configuration;
         var app = builder.Build();

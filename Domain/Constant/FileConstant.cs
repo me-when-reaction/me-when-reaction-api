@@ -7,7 +7,7 @@ namespace MeWhen.Domain.Constant
 {
     public static class FileConstant
     {
-        public const long MAX_SIZE = 1024 * 10;
+        public const long MAX_SIZE = 1024 * 1024 * 10;
         public enum FileTypeEnum
         {
             PNG,

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace MeWhen.Domain.Model
@@ -14,9 +15,11 @@ namespace MeWhen.Domain.Model
         public Guid TagID { get; set; }
 
         [ForeignKey(nameof(TagID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public TagModel Tag { get; set; } = default!;
 
         [ForeignKey(nameof(ImageID))]
+        [DeleteBehavior(DeleteBehavior.Cascade)]
         public ImageModel Image { get; set; } = default!;
     }
 }
