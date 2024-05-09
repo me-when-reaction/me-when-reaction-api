@@ -22,5 +22,18 @@ namespace MeWhen.Controller
                 return Created201();
             });
 
+        [HttpPatch]
+        public async Task<IActionResult> Insert([FromForm] UpdateImageCommand data) =>
+            await Run(async () => {
+                await mediator.Send(data);
+                return Data200("Successfuly update data");
+            });
+        
+        [HttpDelete]
+        public async Task<IActionResult> Insert([FromQuery] DeleteImageCommand data) =>
+            await Run(async () => {
+                await mediator.Send(data);
+                return Data200("Successfully delete data");
+            });
     }
 }

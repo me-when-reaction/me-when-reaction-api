@@ -14,14 +14,14 @@ namespace MeWhen.Import
 {
     public static class ImportScript
     {
-        public static async void Import()
+        public static void Import()
         {
             // reset data
 
             var workBook = new XLWorkbook("./me-when.xlsx");
             var ctx = new MeWhenDBContext(new DbContextOptionsBuilder<MeWhenDBContext>()
                 .UseNpgsql(Program.Config.GetConnectionString("Default")).Options);
-            
+
             ctx.Set<ImageTagModel>().ExecuteDelete();
             ctx.Set<ImageModel>().ExecuteDelete();
             ctx.Set<TagModel>().ExecuteDelete();
@@ -34,7 +34,7 @@ namespace MeWhen.Import
 
             var rowIndex = 2;
             var worksheet = workBook.Worksheet(1);
-            while(!worksheet.Cell(rowIndex, 1).IsEmpty())
+            while (!worksheet.Cell(rowIndex, 1).IsEmpty())
             {
                 var row = worksheet.Row(rowIndex++);
                 image.Add(new ImageModel()
@@ -57,7 +57,7 @@ namespace MeWhen.Import
 
             rowIndex = 2;
             worksheet = workBook.Worksheet(3);
-            while(!worksheet.Cell(rowIndex, 1).IsEmpty())
+            while (!worksheet.Cell(rowIndex, 1).IsEmpty())
             {
                 var row = worksheet.Row(rowIndex++);
                 tag.Add(new TagModel()
@@ -75,7 +75,7 @@ namespace MeWhen.Import
 
             rowIndex = 2;
             worksheet = workBook.Worksheet(2);
-            while(!worksheet.Cell(rowIndex, 1).IsEmpty())
+            while (!worksheet.Cell(rowIndex, 1).IsEmpty())
             {
                 var row = worksheet.Row(rowIndex++);
                 imageTag.Add(new ImageTagModel()

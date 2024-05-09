@@ -32,6 +32,6 @@ namespace MeWhen.Domain.Model
         public required ModelConstant.AgeRating AgeRating { get; set; }
 
         [InverseProperty("Image")]
-        public List<ImageTagModel> Tags { get; } = [];
+        public List<ImageTagModel> Tags { get; set; } = [];
     }
 }

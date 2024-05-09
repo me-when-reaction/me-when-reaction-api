@@ -2,8 +2,8 @@ using System;
 
 namespace MeWhen.Domain.Exception
 {
-    public class BadRequestException(List<string> ErrorMessages) : System.Exception(string.Join("|", ErrorMessages))
+    public class BadRequestException(string errorMessage) : System.Exception(errorMessage)
     {
-        public List<string> ListError { get; } = ErrorMessages;
+        public string ListError { get; } = errorMessage;
     }
 }

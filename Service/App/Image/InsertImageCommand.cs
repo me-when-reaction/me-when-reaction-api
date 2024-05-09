@@ -1,19 +1,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
+using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Domain.Validator;
 using MeWhen.Infrastructure.Context;
 using MeWhen.Infrastructure.Helper;
 using MeWhen.Service.App.Tag;
-using MeWhen.Service.Common;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MeWhen.Service.App.Image
 {
+    [DataContract]
     public class InsertImageCommand : IRequest
     {
         public required string Name { get; set; }
@@ -21,9 +23,8 @@ namespace MeWhen.Service.App.Image
         public required string Source { get; set; }
         public required IFormFile Image { get; set; }
         public required List<string> Tags { get; set; } = [];
-        
-        [BindNever]
-        public string Extension => Image.FileName.Split(".", 2)[1];
+        public required ModelConstant.AgeRating AgeRating { get; set; }
+        internal string Extension => Image.FileName.Split(".", 2)[1];
     }
 
     public class InsertImageValidator : AbstractValidator<InsertImageCommand>
@@ -37,7 +38,7 @@ namespace MeWhen.Service.App.Image
         }
     }
 
-    public class InsertImageCommandHandler(MeWhenDBContext _DB, IMediator _Mediator) : IRequestHandler<InsertImageCommand>
+    public class InsertImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<InsertImageCommand>
     {
         public async Task Handle(InsertImageCommand request, CancellationToken cancellationToken)
         {
@@ -46,7 +47,7 @@ namespace MeWhen.Service.App.Image
             var image = new ImageModel(){
                 Name = request.Name,
                 UploadDate = DateTime.Now.SpecifyKind(),
-                AgeRating = Domain.Constant.ModelConstant.AgeRating.GENERAL,
+                AgeRating = request.AgeRating,
                 ID = imageID,
                 Extension = request.Extension,
                 Description = request.Description,
@@ -64,8 +65,9 @@ namespace MeWhen.Service.App.Image
                 {
                     ID = Guid.NewGuid(),
                     Name = x,
-                    AgeRating = Domain.Constant.ModelConstant.AgeRating.GENERAL
-                });
+                    AgeRating = ModelConstant.AgeRating.GENERAL
+                })
+                .ToList();
 
             var imageTag = tagInDB.Union(tagNotInDB)
                 .Select(x => new ImageTagModel()
@@ -80,7 +82,7 @@ namespace MeWhen.Service.App.Image
             await _DB.AddRangeAsync(imageTag, cancellationToken);
 
             await _DB.SaveChangesAsync(cancellationToken);   
-            await _Mediator.Send(new UploadImageCommand { File = request.Image, FileName = $"{imageID}.{request.Extension}" }, cancellationToken);
+            await FileHelper.UploadFile($"{imageID}.{request.Extension}", request.Image.OpenReadStream(), cancellationToken);
         }
     }
 }
