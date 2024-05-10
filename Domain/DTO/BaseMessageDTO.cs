@@ -9,6 +9,7 @@ namespace MeWhen.Domain.DTO
     {
         public DateTime MessageDate { get; set; } = DateTime.Now;
         public required int StatusCode { get; set; }
+        public required string Message { get; set; }
         public required object Data { get; set; }
     }
 }

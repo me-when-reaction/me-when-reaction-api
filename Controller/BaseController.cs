@@ -16,13 +16,15 @@ namespace MeWhen.Controller
         public IActionResult Data200(object obj) => Ok(new BaseMessageDTO()
         {
             Data = obj,
-            StatusCode = StatusCodes.Status200OK
+            StatusCode = StatusCodes.Status200OK,
+            Message = "Successfully execute an operation 👍"
         });
 
         [NonAction]
-        public IActionResult Created201() => Ok(new BaseMessageDTO()
+        public IActionResult Created201(object obj) => Ok(new BaseMessageDTO()
         {
-            Data = "Successfully insert new data",
+            Data = obj,
+            Message = "Successfully insert new data 📜",
             StatusCode = StatusCodes.Status201Created
         });
 
@@ -30,6 +32,7 @@ namespace MeWhen.Controller
         public IActionResult ServerError500(Exception e) => StatusCode(StatusCodes.Status500InternalServerError, new BaseMessageDTO()
         {
             Data = e.Message,
+            Message = "Oops, something went wrong with the server 😔",
             StatusCode = StatusCodes.Status400BadRequest
         });
 
@@ -37,6 +40,7 @@ namespace MeWhen.Controller
         public IActionResult BadRequest400(object o) => StatusCode(StatusCodes.Status400BadRequest, new BaseMessageDTO()
         {
             Data = o,
+            Message = "Is there something wrong with your request? Check again 🤔",
             StatusCode = StatusCodes.Status400BadRequest
         });
 
@@ -49,7 +53,7 @@ namespace MeWhen.Controller
             }
             catch (BadRequestException e)
             {
-                return BadRequest400(e);
+                return BadRequest400(e.Message);
             }
             catch (ValidationException e)
             {

@@ -17,10 +17,7 @@ namespace MeWhen.Controller
 
         [HttpPost]
         public async Task<IActionResult> Insert([FromForm] InsertImageCommand data) =>
-            await Run(async () => {
-                await mediator.Send(data);
-                return Created201();
-            });
+            await Run(async () => Data200(await mediator.Send(data)));
 
         [HttpPatch]
         public async Task<IActionResult> Insert([FromForm] UpdateImageCommand data) =>

@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace MeWhen.Service.App.Image
 {
     [DataContract]
-    public class InsertImageCommand : IRequest
+    public class InsertImageCommand : IRequest<InsertImageCommandResponse>
     {
         public required string Name { get; set; }
         public required string Description { get; set; }
@@ -27,9 +27,14 @@ namespace MeWhen.Service.App.Image
         internal string Extension => Image.FileName.Split(".", 2)[1];
     }
 
-    public class InsertImageValidator : AbstractValidator<InsertImageCommand>
+    public class InsertImageCommandResponse(Guid id)
     {
-        public InsertImageValidator()
+        public Guid ID { get; set; } = id;
+    }
+
+    public class InsertImageCommandValidator : AbstractValidator<InsertImageCommand>
+    {
+        public InsertImageCommandValidator()
         {
             RuleFor(x => x.Tags).NotEmpty();
             RuleFor(x => x.Name).NotEmpty();
@@ -38,9 +43,9 @@ namespace MeWhen.Service.App.Image
         }
     }
 
-    public class InsertImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<InsertImageCommand>
+    public class InsertImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<InsertImageCommand, InsertImageCommandResponse>
     {
-        public async Task Handle(InsertImageCommand request, CancellationToken cancellationToken)
+        public async Task<InsertImageCommandResponse> Handle(InsertImageCommand request, CancellationToken cancellationToken)
         {
             // Masuk gambar
             var imageID = Guid.NewGuid();            
@@ -76,13 +81,18 @@ namespace MeWhen.Service.App.Image
                     ImageID = imageID,
                     TagID = x.ID
                 });
-            
-            await _DB.AddAsync(image, cancellationToken);
-            await _DB.AddRangeAsync(tagNotInDB, cancellationToken);
-            await _DB.AddRangeAsync(imageTag, cancellationToken);
 
-            await _DB.SaveChangesAsync(cancellationToken);   
-            await FileHelper.UploadFile($"{imageID}.{request.Extension}", request.Image.OpenReadStream(), cancellationToken);
+            await _DB.Transaction(async t => {
+                await _DB.AddAsync(image, cancellationToken);
+                await _DB.AddRangeAsync(tagNotInDB, cancellationToken);
+                await _DB.AddRangeAsync(imageTag, cancellationToken);
+
+                await _DB.SaveChangesAsync(cancellationToken);
+                var a = await FileHelper.UploadFile($"{imageID}.{request.Extension}", request.Image.OpenReadStream(), cancellationToken);
+                if (!a) throw new Exception("Upload file failed");
+            });
+            
+            return new InsertImageCommandResponse(imageID);
         }
     }
 }
