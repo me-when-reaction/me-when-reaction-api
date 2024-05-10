@@ -25,6 +25,7 @@ namespace MeWhen.Service.App.Image
     {
         public required string Name { get; set; }
         public required string Link { get; set; }
+        public required DateTime UploadDate { get; set; }
         public required ModelConstant.AgeRating AgeRating { get; set; }
         public required List<string> Tags { get; set; }
     }
@@ -46,14 +47,16 @@ namespace MeWhen.Service.App.Image
                         (request.TagAND.Count == 0 || request.TagAND.All(x => tags.Any(y => y == x))) &&
                         (request.TagOR.Count == 0 || request.TagOR.Any(x => tags.Any(y => y == x)))
                     )) && i.AgeRating <= request.AgeRating
+                orderby i.UploadDate descending
                 select new GetImageQueryResponse()
                 {
                     Name = i.Name,
                     AgeRating = i.AgeRating,
                     Link = $"{link}/{i.ID}.{i.Extension}",
-                    Tags = i.Tags.Select(x => x.Tag.Name).ToList()
+                    Tags = i.Tags.Select(x => x.Tag.Name).ToList(),
+                    UploadDate = i.UploadDate
                 }
-            ).ToListAsync(cancellationToken: cancellationToken);
+            ).Take(10).ToListAsync(cancellationToken: cancellationToken);
         }
     }
 }
