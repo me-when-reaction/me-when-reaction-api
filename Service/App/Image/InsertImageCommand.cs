@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using MeWhen.Domain.Constant;
+using MeWhen.Domain.DTO;
 using MeWhen.Domain.Model;
 using MeWhen.Domain.Validator;
 using MeWhen.Infrastructure.Context;
@@ -24,7 +25,7 @@ namespace MeWhen.Service.App.Image
         public required IFormFile Image { get; set; }
         public required List<string> Tags { get; set; } = [];
         public required ModelConstant.AgeRating AgeRating { get; set; }
-        internal string Extension => Image.FileName.Split(".", 2)[1];
+        public required bool ConsentCompressed { get; set; }
     }
 
     public class InsertImageCommandResponse(Guid id)
@@ -48,15 +49,21 @@ namespace MeWhen.Service.App.Image
         public async Task<InsertImageCommandResponse> Handle(InsertImageCommand request, CancellationToken cancellationToken)
         {
             // Masuk gambar
-            var imageID = Guid.NewGuid();            
-            var image = new ImageModel(){
+            var imageID = Guid.NewGuid();
+
+            // Nyoba dulu apa gambarnya bisa dicompress jadi 20KB
+            // Kl nga bisa, y sudahlah 😔
+            var processedImage = new CompressedImageDTO(request.Image);
+
+            var image = new ImageModel()
+            {
                 Name = request.Name,
                 UploadDate = DateTime.Now.SpecifyKind(),
                 AgeRating = request.AgeRating,
                 ID = imageID,
-                Extension = request.Extension,
+                Extension = processedImage.Extension,
                 Description = request.Description,
-                Link = $"{imageID}.{request.Extension}",
+                Link = $"{imageID}.{processedImage.Extension}",
                 Source = request.Source ?? ""
             };
 
@@ -82,16 +89,17 @@ namespace MeWhen.Service.App.Image
                     TagID = x.ID
                 });
 
-            await _DB.Transaction(async t => {
+            await _DB.Transaction(async t =>
+            {
                 await _DB.AddAsync(image, cancellationToken);
                 await _DB.AddRangeAsync(tagNotInDB, cancellationToken);
                 await _DB.AddRangeAsync(imageTag, cancellationToken);
 
                 await _DB.SaveChangesAsync(cancellationToken);
-                var a = await FileHelper.UploadFile($"{imageID}.{request.Extension}", request.Image.OpenReadStream(), cancellationToken);
+                var a = await FileHelper.UploadImage($"{imageID}.{processedImage.Extension}", processedImage.Content, cancellationToken);
                 if (!a) throw new Exception("Upload file failed");
             });
-            
+
             return new InsertImageCommandResponse(imageID);
         }
     }

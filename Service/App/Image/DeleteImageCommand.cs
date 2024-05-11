@@ -35,7 +35,7 @@ namespace MeWhen.Service.App.Image
             var link = $"{image.ID}.{image.Extension}";
             _DB.Remove(image);
             await _DB.SaveChangesAsync(cancellationToken);
-            await FileHelper.DeleteFile(link);
+            await FileHelper.DeleteImage(link);
         }
     }
 }
