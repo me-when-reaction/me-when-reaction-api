@@ -7,6 +7,9 @@ using System.Text.Json.Serialization;
 using MediatR;
 using MeWhen.Service.Pipe;
 using MeWhen.Domain.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 internal class Program
 {
@@ -39,8 +42,23 @@ internal class Program
                 config.RegisterServicesFromAssembly(typeof(Program).Assembly);
                 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
             });
+
+        builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(opt => {
+                opt.TokenValidationParameters = new()
+                {
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Supabase:JWT:Secret")!)),
+                    ValidIssuer = builder.Configuration.GetValue<string>("Supabase:JWT:Issuer")!,
+                    ValidAudience = builder.Configuration.GetValue<string>("Supabase:JWT:Audience")!
+                };
+            });
+
+        builder.Services.AddHttpContextAccessor();
         
-        var supabaseConfig = Config.GetSection("Supabase:Service").Get<SupabaseConfiguration>() ?? throw new Exception("Supabase service not found");
+        var supabaseConfig = builder.Configuration.GetSection("Supabase:Service").Get<SupabaseConfiguration>() ?? throw new Exception("Supabase service not found");
 
         Config = builder.Configuration;
         Supabase = await new Supabase.Client(
@@ -53,7 +71,8 @@ internal class Program
         ).InitializeAsync();
 
         var app = builder.Build();
-
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseSwagger().UseSwaggerUI();
         app.MapControllers();
 
