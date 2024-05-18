@@ -11,6 +11,7 @@ namespace MeWhen.Infrastructure.MigrationHistory
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("SET TimeZone='UTC';");
             migrationBuilder.CreateTable(
                 name: "ms_user",
                 columns: table => new
@@ -44,7 +45,6 @@ namespace MeWhen.Infrastructure.MigrationHistory
                     description = table.Column<string>(type: "text", nullable: false),
                     source = table.Column<string>(type: "text", nullable: false),
                     extension = table.Column<string>(type: "text", nullable: false),
-                    upload_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     age_rating = table.Column<int>(type: "integer", nullable: false),
                     date_in = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     date_up = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),

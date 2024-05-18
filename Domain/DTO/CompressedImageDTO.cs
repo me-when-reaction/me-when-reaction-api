@@ -18,20 +18,26 @@ namespace MeWhen.Domain.DTO
             FileName = file.FileName;
             Length = file.Length;
 
-            using var stream = new MemoryStream();
-            file.CopyToAsync(stream);
-
+            var stream = new MemoryStream();
             stream.Seek(0, SeekOrigin.Begin);
+            file.CopyToAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // stream.Seek(0, SeekOrigin.Begin);
             Content = stream;
+            // Content = (MemoryStream)file.OpenReadStream();
 
             // Try compress
             if (Length > FileConstant.MAX_FILESIZE_STORAGE)
             {
-                using var newImage = new MagickImage(Content);
-                newImage.Quality = 50;
+                var newImage = new MagickImage(Content)
+                {
+                    Quality = 50
+                };
 
                 Content.SetLength(0);
                 newImage.Write(Content);
+                stream.Seek(0, SeekOrigin.Begin);
 
                 if (Content.Length > FileConstant.MAX_FILESIZE_STORAGE)
                     throw new BadRequestException("Sorry, we cannot compress the image 😞");

@@ -8,6 +8,7 @@ using MeWhen.Domain.Exception;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
 using MeWhen.Infrastructure.Helper;
+using MeWhen.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeWhen.Service.App.Image
@@ -25,7 +26,7 @@ namespace MeWhen.Service.App.Image
         }
     }
 
-    public class DeleteImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<DeleteImageCommand>
+    public class DeleteImageCommandHandler(MeWhenDBContext _DB, IFileUtilities _File) : IRequestHandler<DeleteImageCommand>
     {
         public async Task Handle(DeleteImageCommand request, CancellationToken cancellationToken)
         {
@@ -35,7 +36,7 @@ namespace MeWhen.Service.App.Image
             var link = $"{image.ID}.{image.Extension}";
             _DB.Remove(image);
             await _DB.SaveChangesAsync(cancellationToken);
-            await FileHelper.DeleteImage(link);
+            await _File.DeleteImage(link);
         }
     }
 }

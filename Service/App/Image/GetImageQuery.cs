@@ -2,12 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
 using MediatR;
+using MeWhen.Domain.Configuration;
 using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using MeWhen.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace MeWhen.Service.App.Image
 {
@@ -19,6 +23,27 @@ namespace MeWhen.Service.App.Image
 
         [BindNever]
         public List<string> JoinedTag => TagAND.Union(TagOR).ToList();
+
+        /// <summary>
+        /// No pagination = 0
+        /// </summary>
+        public int PageSize { get; set; } = 10;
+        public int PageNumber { get; set; } = 1;
+
+    }
+
+    public class GetImageQueryValidator : AbstractValidator<GetImageQuery>
+    {
+        public GetImageQueryValidator(IAuthUtilities _Auth)
+        {
+            RuleFor(x => x.PageSize)
+                .GreaterThanOrEqualTo(10)
+                .When(x => !_Auth.IsAuthenticated())
+                .WithMessage("No pagination is available only for authenticated users.");
+            
+            RuleFor(x => x.PageNumber)
+                .GreaterThanOrEqualTo(1);
+        }
     }
 
     public class GetImageQueryResponse
@@ -30,11 +55,15 @@ namespace MeWhen.Service.App.Image
         public required List<string> Tags { get; set; }
     }
 
-    public class GetImageQueryHandler(MeWhenDBContext _DB, IConfiguration _Config) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
+    public class GetImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
     {
         public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
         {
-            var link = _Config.GetValue<string>("TempPath");
+            var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
+                _StorageConf.Value.NativePath : 
+                    _Supabase.Storage
+                    .From(_StorageConf.Value.Bucket)
+                    .GetPublicUrl("")[..^1];
 
             return await (
                 from i in _DB.Set<ImageModel>()
@@ -47,16 +76,19 @@ namespace MeWhen.Service.App.Image
                         (request.TagAND.Count == 0 || request.TagAND.All(x => tags.Any(y => y == x))) &&
                         (request.TagOR.Count == 0 || request.TagOR.Any(x => tags.Any(y => y == x)))
                     )) && i.AgeRating <= request.AgeRating
-                orderby i.UploadDate descending
+                orderby i.DateIn descending
                 select new GetImageQueryResponse()
                 {
                     Name = i.Name,
                     AgeRating = i.AgeRating,
                     Link = $"{link}/{i.ID}.{i.Extension}",
                     Tags = i.Tags.Select(x => x.Tag.Name).ToList(),
-                    UploadDate = i.UploadDate
+                    UploadDate = i.DateIn
                 }
-            ).Take(10).ToListAsync(cancellationToken: cancellationToken);
+            )
+            .Skip(request.PageSize * (request.PageNumber - 1))
+            .Take(request.PageSize)
+            .ToListAsync(cancellationToken: cancellationToken);
         }
     }
 }

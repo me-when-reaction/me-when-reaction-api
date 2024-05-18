@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MeWhen.Infrastructure.MigrationHistory
 {
     [DbContext(typeof(MeWhenDBContext))]
-    [Migration("20240506164305_InitialCreate")]
+    [Migration("20240518154129_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -76,10 +76,6 @@ namespace MeWhen.Infrastructure.MigrationHistory
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("source");
-
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("upload_date");
 
                     b.Property<Guid?>("UserDel")
                         .HasColumnType("uuid")

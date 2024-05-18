@@ -11,6 +11,7 @@ using MeWhen.Domain.Model;
 using MeWhen.Domain.Validator;
 using MeWhen.Infrastructure.Context;
 using MeWhen.Infrastructure.Helper;
+using MeWhen.Infrastructure.Utilities;
 using MeWhen.Service.App.Tag;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -44,12 +45,13 @@ namespace MeWhen.Service.App.Image
         }
     }
 
-    public class InsertImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<InsertImageCommand, InsertImageCommandResponse>
+    public class InsertImageCommandHandler(MeWhenDBContext _DB, IAuthUtilities _Auth, IFileUtilities _File) : IRequestHandler<InsertImageCommand, InsertImageCommandResponse>
     {
         public async Task<InsertImageCommandResponse> Handle(InsertImageCommand request, CancellationToken cancellationToken)
         {
             // Masuk gambar
             var imageID = Guid.NewGuid();
+            var userID = _Auth.GetUserID();
 
             // Nyoba dulu apa gambarnya bisa dicompress jadi 20KB
             // Kl nga bisa, y sudahlah 😔
@@ -58,13 +60,13 @@ namespace MeWhen.Service.App.Image
             var image = new ImageModel()
             {
                 Name = request.Name,
-                UploadDate = DateTime.Now.SpecifyKind(),
                 AgeRating = request.AgeRating,
                 ID = imageID,
                 Extension = processedImage.Extension,
                 Description = request.Description,
                 Link = $"{imageID}.{processedImage.Extension}",
-                Source = request.Source ?? ""
+                Source = request.Source ?? "",
+                UserIn = userID
             };
 
             // Masuk tag yang not exists
@@ -77,7 +79,8 @@ namespace MeWhen.Service.App.Image
                 {
                     ID = Guid.NewGuid(),
                     Name = x,
-                    AgeRating = ModelConstant.AgeRating.GENERAL
+                    AgeRating = ModelConstant.AgeRating.GENERAL,
+                    UserIn = userID
                 })
                 .ToList();
 
@@ -86,7 +89,8 @@ namespace MeWhen.Service.App.Image
                 {
                     ID = Guid.NewGuid(),
                     ImageID = imageID,
-                    TagID = x.ID
+                    TagID = x.ID,
+                    UserIn = userID
                 });
 
             await _DB.Transaction(async t =>
@@ -96,8 +100,7 @@ namespace MeWhen.Service.App.Image
                 await _DB.AddRangeAsync(imageTag, cancellationToken);
 
                 await _DB.SaveChangesAsync(cancellationToken);
-                var a = await FileHelper.UploadImage($"{imageID}.{processedImage.Extension}", processedImage.Content, cancellationToken);
-                if (!a) throw new Exception("Upload file failed");
+                await _File.UploadImage($"{imageID}.{processedImage.Extension}", processedImage.Content, cancellationToken);
             });
 
             return new InsertImageCommandResponse(imageID);

@@ -8,6 +8,8 @@ using MeWhen.Domain.Constant;
 using MeWhen.Domain.Exception;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using MeWhen.Infrastructure.Helper;
+using MeWhen.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeWhen.Service.App.Image
@@ -30,10 +32,11 @@ namespace MeWhen.Service.App.Image
         }
     }
 
-    public class UpdateImageCommandHandler(MeWhenDBContext _DB) : IRequestHandler<UpdateImageCommand>
+    public class UpdateImageCommandHandler(MeWhenDBContext _DB, IAuthUtilities _Auth) : IRequestHandler<UpdateImageCommand>
     {
         public async Task Handle(UpdateImageCommand request, CancellationToken cancellationToken)
         {
+            var userID = _Auth.GetUserID();
             var image = _DB
                 .Set<ImageModel>()
                 .Include(x => x.Tags)
@@ -41,18 +44,23 @@ namespace MeWhen.Service.App.Image
                 .FirstOrDefault(x => x.ID == request.ID)
             ?? throw new BadRequestException("Image not found");
 
-            if (!string.IsNullOrWhiteSpace(request.Name)) image.Name = request.Name;
-            if (!string.IsNullOrWhiteSpace(request.Description)) image.Description = request.Description;
-            if (!string.IsNullOrWhiteSpace(request.Source)) image.Source = request.Source;
-            if (request.AgeRating.HasValue) image.AgeRating = request.AgeRating.Value;
-
+            bool changed = false;
+            if (!string.IsNullOrWhiteSpace(request.Name)) { image.Name = request.Name; changed = true; }
+            if (!string.IsNullOrWhiteSpace(request.Description)) { image.Description = request.Description; changed = true; }
+            if (!string.IsNullOrWhiteSpace(request.Source)) { image.Source = request.Source; changed = true; }
+            if (request.AgeRating.HasValue) { image.AgeRating = request.AgeRating.Value; changed = true; }
+            if (changed)
+            {
+                image.UserUp = userID;
+                image.DateUp = DateTime.UtcNow;
+            }
 
             // Hapus yang nga ada di list
             if (request.Tags != null && request.Tags.Count != 0)
             {
                 // Tag ini bakal dihapus
                 var deletedTag = image.Tags.Where(x => !request.Tags.Contains(x.Tag.Name)).ToList();
-                
+
                 // Sisa tag yang available
                 var unchangedTag = image.Tags.Where(x => request.Tags.Contains(x.Tag.Name)).Select(x => x.Tag.Name);
 
@@ -66,20 +74,22 @@ namespace MeWhen.Service.App.Image
                     {
                         ID = Guid.NewGuid(),
                         Name = x,
-                        AgeRating = ModelConstant.AgeRating.GENERAL
+                        AgeRating = ModelConstant.AgeRating.GENERAL,
+                        UserIn = userID
                     })
                     .ToList();
 
-                
+
                 // Insert imagetag baru ini
                 var imageTag = tagInDB.Union(tagNotInDB)
                 .Select(x => new ImageTagModel()
                 {
                     ID = Guid.NewGuid(),
                     ImageID = image.ID,
-                    TagID = x.ID
+                    TagID = x.ID,
+                    UserIn = userID
                 }).ToList();
-            
+
 
                 _DB.AddRange(tagNotInDB);
                 if (deletedTag.Count > 0) _DB.RemoveRange(deletedTag);

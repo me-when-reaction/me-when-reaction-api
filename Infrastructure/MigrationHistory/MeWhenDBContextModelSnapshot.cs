@@ -74,10 +74,6 @@ namespace MeWhen.Infrastructure.MigrationHistory
                         .HasColumnType("text")
                         .HasColumnName("source");
 
-                    b.Property<DateTime>("UploadDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("upload_date");
-
                     b.Property<Guid?>("UserDel")
                         .HasColumnType("uuid")
                         .HasColumnName("user_del");
