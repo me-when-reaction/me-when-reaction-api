@@ -18,9 +18,14 @@ namespace MeWhen.Import
         {
             // reset data
 
+            var conf = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile($"appsettings.json", true, true)
+                .Build();
+
             var workBook = new XLWorkbook("./me-when.xlsx");
             var ctx = new MeWhenDBContext(new DbContextOptionsBuilder<MeWhenDBContext>()
-                .UseNpgsql(Program.Config.GetConnectionString("Default")).Options);
+                .UseNpgsql(conf.GetConnectionString("Default")).Options);
 
             ctx.Set<ImageTagModel>().ExecuteDelete();
             ctx.Set<ImageModel>().ExecuteDelete();
@@ -51,7 +56,7 @@ namespace MeWhen.Import
                         "EXPLICIT" => AgeRating.EXPLICIT,
                         _ => AgeRating.GENERAL,
                     },
-                    UploadDate = DateTime.Now.SpecifyKind(),
+                    UserIn = new Guid("4bb78760-fd94-415f-8eb3-bd86377f7a4d")
                 });
             }
 
@@ -69,7 +74,8 @@ namespace MeWhen.Import
                         "MATURE" => AgeRating.MATURE,
                         "EXPLICIT" => AgeRating.EXPLICIT,
                         _ => AgeRating.GENERAL,
-                    }
+                    },
+                    UserIn = new Guid("4bb78760-fd94-415f-8eb3-bd86377f7a4d")
                 });
             }
 
@@ -82,7 +88,8 @@ namespace MeWhen.Import
                 {
                     ID = row.Cell(1).CachedValue.GetText().ToGUID(),
                     ImageID = row.Cell(2).CachedValue.GetText().ToGUID(),
-                    TagID = row.Cell(4).CachedValue.GetText().ToGUID()
+                    TagID = row.Cell(4).CachedValue.GetText().ToGUID(),
+                    UserIn = new Guid("4bb78760-fd94-415f-8eb3-bd86377f7a4d")
                 });
             }
 

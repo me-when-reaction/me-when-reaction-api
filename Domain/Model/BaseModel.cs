@@ -12,7 +12,7 @@ namespace MeWhen.Domain.Model
         public Guid ID { get; set; } = Guid.NewGuid();
 
         [Column("date_in")]
-        public DateTime DateIn { get; set; } = DateTime.Now.SpecifyKind();
+        public DateTime DateIn { get; set; } = DateTime.UtcNow;
 
         [Column("date_up")]
         public DateTime? DateUp { get; set; }

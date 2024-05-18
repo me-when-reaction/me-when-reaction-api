@@ -11,5 +11,12 @@ namespace MeWhen.Controller
         [HttpGet("search")]
         public async Task<IActionResult> Get([FromQuery] GetTagSuggestionQuery data) =>
             await Run(async () => Data200(await mediator.Send(data)));
+
+        [HttpPatch]
+        public async Task<IActionResult> UpdateRating([FromForm] UpdateTagRatingCommand data) =>
+            await Run(async () => {
+                await mediator.Send(data);
+                return Data200("Successfully update this tag 👍");
+            });
     }
 }

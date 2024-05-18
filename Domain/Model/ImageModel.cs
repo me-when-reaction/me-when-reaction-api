@@ -25,9 +25,6 @@ namespace MeWhen.Domain.Model
         [Column("extension", TypeName = "text")]
         public required string Extension { get; set; }
 
-        [Column("upload_date")]
-        public required DateTime UploadDate { get; set; }
-
         [Column("age_rating")]
         public required ModelConstant.AgeRating AgeRating { get; set; }
 

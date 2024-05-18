@@ -24,7 +24,7 @@ namespace MeWhen.Domain.Constant
             JPEG,
             WEBP
         }
-        
+
         public static readonly Dictionary<FileTypeEnum, string> MIME = new(){
             { FileTypeEnum.PNG, "image/png" },
             { FileTypeEnum.JPG, "image/jpg" },
@@ -38,5 +38,12 @@ namespace MeWhen.Domain.Constant
             { FileTypeEnum.JPEG, "jpeg" },
             { FileTypeEnum.WEBP, "webp" },
         };
+
+        public static class StorageType
+        {
+            public const string Native = "Native";
+            public const string Supabase = "Supabase";
+            public const string S3 = "S3";
+        }
     }
 }
