@@ -1,10 +1,10 @@
 using System;
 using MediatR;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Service.App.Tag
+namespace MeWhenAPI.Service.App.Tag
 {
     public class GetTagSuggestionQuery : IRequest<List<GetTagSuggestionResponse>>
     {

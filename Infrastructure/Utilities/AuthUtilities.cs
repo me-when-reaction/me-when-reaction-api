@@ -1,8 +1,8 @@
 using System;
 using System.Security.Claims;
-using MeWhen.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Helper;
 
-namespace MeWhen.Infrastructure.Utilities
+namespace MeWhenAPI.Infrastructure.Utilities
 {
     public interface IAuthUtilities
     {

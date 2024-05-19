@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using MeWhen.Service.App.Image;
+using MeWhenAPI.Service.App.Image;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeWhen.Controller
+namespace MeWhenAPI.Controller
 {
     [Route("image")]
     public class ImageController(IMediator mediator) : BaseController
@@ -28,14 +28,16 @@ namespace MeWhen.Controller
 
         [HttpPatch]
         public async Task<IActionResult> Insert([FromForm] UpdateImageCommand data) =>
-            await Run(async () => {
+            await Run(async () =>
+            {
                 await mediator.Send(data);
                 return Data200("Successfuly update data");
             });
-        
+
         [HttpDelete]
         public async Task<IActionResult> Insert([FromQuery] DeleteImageCommand data) =>
-            await Run(async () => {
+            await Run(async () =>
+            {
                 await mediator.Send(data);
                 return Data200("Successfully delete data");
             });

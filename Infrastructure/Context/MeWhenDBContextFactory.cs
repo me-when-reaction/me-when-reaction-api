@@ -2,7 +2,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
-namespace MeWhen.Infrastructure.Context
+namespace MeWhenAPI.Infrastructure.Context
 {
     public class MeWhenDBContextFactory : IDesignTimeDbContextFactory<MeWhenDBContext>
     {

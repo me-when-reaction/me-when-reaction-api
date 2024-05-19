@@ -4,11 +4,11 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using FluentValidation;
-using MeWhen.Domain.DTO;
-using MeWhen.Domain.Exception;
+using MeWhenAPI.Domain.DTO;
+using MeWhenAPI.Domain.Exception;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeWhen.Controller
+namespace MeWhenAPI.Controller
 {
     public class BaseController : ControllerBase
     {

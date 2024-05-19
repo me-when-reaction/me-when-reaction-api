@@ -3,7 +3,7 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeWhen.Controller
+namespace MeWhenAPI.Controller
 {
     [Route("sandbox")]
     public class SandboxController(Supabase.Client _Supabase) : BaseController

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MeWhen.Domain.Constant
+namespace MeWhenAPI.Domain.Constant
 {
     public static class FileConstant
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace MeWhen.Domain.Exception
+namespace MeWhenAPI.Domain.Exception
 {
     public class BadRequestException(string errorMessage) : System.Exception(errorMessage)
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace MeWhen.Domain.Configuration
+namespace MeWhenAPI.Domain.Configuration
 {
     public class SupabaseConfiguration
     {

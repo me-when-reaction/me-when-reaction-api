@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using MeWhen.Domain.Configuration;
-using MeWhen.Domain.Constant;
-using MeWhen.Infrastructure.Helper;
+using MeWhenAPI.Domain.Configuration;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Infrastructure.Helper;
 using Microsoft.Extensions.Options;
 
-namespace MeWhen.Infrastructure.Utilities
+namespace MeWhenAPI.Infrastructure.Utilities
 {
     public interface IFileUtilities
     {

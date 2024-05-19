@@ -1,11 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MeWhen.Domain.Constant;
+using MeWhenAPI.Domain.Constant;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 
-namespace MeWhen.Domain.Model
+namespace MeWhenAPI.Domain.Model
 {
     [Table("tr_image")]
     public class ImageModel : BaseModel

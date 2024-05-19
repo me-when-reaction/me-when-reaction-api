@@ -4,14 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhen.Domain.Exception;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Helper;
-using MeWhen.Infrastructure.Utilities;
+using MeWhenAPI.Domain.Exception;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Service.App.Image
+namespace MeWhenAPI.Service.App.Image
 {
     public class DeleteImageCommand : IRequest
     {
@@ -32,7 +32,7 @@ namespace MeWhen.Service.App.Image
         {
             var image = _DB.Set<ImageModel>().FirstOrDefault(x => x.ID == request.ID)
                 ?? throw new BadRequestException("Image not found");
-            
+
             var link = $"{image.ID}.{image.Extension}";
             _DB.Remove(image);
             await _DB.SaveChangesAsync(cancellationToken);

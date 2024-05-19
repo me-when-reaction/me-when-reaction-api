@@ -1,9 +1,9 @@
 using System;
 using MediatR;
-using MeWhen.Service.App.Tag;
+using MeWhenAPI.Service.App.Tag;
 using Microsoft.AspNetCore.Mvc;
 
-namespace MeWhen.Controller
+namespace MeWhenAPI.Controller
 {
     [Route("tag")]
     public class TagController(IMediator mediator) : BaseController
@@ -14,7 +14,8 @@ namespace MeWhen.Controller
 
         [HttpPatch]
         public async Task<IActionResult> UpdateRating([FromForm] UpdateTagRatingCommand data) =>
-            await Run(async () => {
+            await Run(async () =>
+            {
                 await mediator.Send(data);
                 return Data200("Successfully update this tag 👍");
             });

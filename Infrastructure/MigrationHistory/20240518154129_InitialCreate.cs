@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace MeWhen.Infrastructure.MigrationHistory
+namespace MeWhenAPI.Infrastructure.MigrationHistory
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

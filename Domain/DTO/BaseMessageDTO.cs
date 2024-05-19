@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MeWhen.Domain.DTO
+namespace MeWhenAPI.Domain.DTO
 {
     public class BaseMessageDTO
     {

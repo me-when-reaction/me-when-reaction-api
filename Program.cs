@@ -1,5 +1,5 @@
-using MeWhen;
-using MeWhen.Import;
+using MeWhenAPI;
+using MeWhenAPI.Import;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddApplicationFlow();
