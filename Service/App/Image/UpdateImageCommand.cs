@@ -4,15 +4,15 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.Exception;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Helper;
-using MeWhen.Infrastructure.Utilities;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.Exception;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Utilities;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Service.App.Image
+namespace MeWhenAPI.Service.App.Image
 {
     public class UpdateImageCommand : IRequest
     {

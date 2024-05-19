@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
-using MeWhen.Domain.Configuration;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
+using MeWhenAPI.Domain.Configuration;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace MeWhen.Service.App.Image
+namespace MeWhenAPI.Service.App.Image
 {
     public class GetRandomImageQuery : IRequest<List<GetRandomImageQueryResponse>>
     {
@@ -31,7 +31,7 @@ namespace MeWhen.Service.App.Image
         public async Task<List<GetRandomImageQueryResponse>> Handle(GetRandomImageQuery request, CancellationToken cancellationToken)
         {
             var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
-                _StorageConf.Value.AccessPath : 
+                _StorageConf.Value.AccessPath :
                     _Supabase.Storage
                     .From(_StorageConf.Value.Bucket)
                     .GetPublicUrl("")[..^1];

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 
-namespace MeWhen.Service.Pipe
+namespace MeWhenAPI.Service.Pipe
 {
     public class ValidatorPipeline<TRequest, TResponse>(IValidator<TRequest> Validator) : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>

@@ -1,16 +1,16 @@
 using System;
 using ClosedXML.Excel;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Helper;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Helper;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
-using static MeWhen.Domain.Constant.ModelConstant;
+using static MeWhenAPI.Domain.Constant.ModelConstant;
 
-namespace MeWhen.Import
+namespace MeWhenAPI.Import
 {
     public static class ImportScript
     {

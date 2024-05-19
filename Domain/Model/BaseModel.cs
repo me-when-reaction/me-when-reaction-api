@@ -1,9 +1,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MeWhen.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Helper;
 
-namespace MeWhen.Domain.Model
+namespace MeWhenAPI.Domain.Model
 {
     public class BaseModel
     {

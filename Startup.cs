@@ -6,17 +6,17 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhen.Domain.Configuration;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Utilities;
-using MeWhen.Service.Pipe;
+using MeWhenAPI.Domain.Configuration;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Utilities;
+using MeWhenAPI.Service.Pipe;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
-namespace MeWhen
+namespace MeWhenAPI
 {
     public static class Startup
     {
@@ -30,9 +30,10 @@ namespace MeWhen
 
             builder.Services.AddControllers()
                 .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-                
+
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(opt => {
+                .AddJwtBearer(opt =>
+                {
                     opt.TokenValidationParameters = new()
                     {
                         ValidateIssuerSigningKey = true,
@@ -43,7 +44,7 @@ namespace MeWhen
                         ValidAudience = builder.Configuration.GetValue<string>("Supabase:JWT:Audience")!
                     };
                 });
-            
+
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<Supabase.Client>(x => new(
                     builder.Configuration.GetValue<string>("Supabase:Service:URL")!,
@@ -55,14 +56,16 @@ namespace MeWhen
                     }
                 )
             );
-            
+
             builder.Services.AddScoped<IAuthUtilities, AuthUtilities>();
             builder.Services.AddScoped<IFileUtilities, FileUtilities>();
 
             builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly)
                 .AddEndpointsApiExplorer()
-                .AddSwaggerGen(config => {
-                    config.SwaggerDoc("v1", new OpenApiInfo(){
+                .AddSwaggerGen(config =>
+                {
+                    config.SwaggerDoc("v1", new OpenApiInfo()
+                    {
                         Title = "Me When API",
                         Version = "v1"
                     });
@@ -70,7 +73,7 @@ namespace MeWhen
                 .AddMediatR(config =>
                 {
                     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-                    
+
                 });
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorNoResponsePipeline<,>));

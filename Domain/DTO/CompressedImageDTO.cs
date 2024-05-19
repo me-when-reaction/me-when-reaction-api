@@ -1,10 +1,10 @@
 using System;
 using ImageMagick;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.Exception;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.Exception;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace MeWhen.Domain.DTO
+namespace MeWhenAPI.Domain.DTO
 {
     public class CompressedImageDTO
     {

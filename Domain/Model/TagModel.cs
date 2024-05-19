@@ -1,8 +1,8 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using MeWhen.Domain.Constant;
+using MeWhenAPI.Domain.Constant;
 
-namespace MeWhen.Domain.Model
+namespace MeWhenAPI.Domain.Model
 {
     [Table("tr_tag")]
     public class TagModel : BaseModel

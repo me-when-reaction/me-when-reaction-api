@@ -1,6 +1,6 @@
 using System;
 
-namespace MeWhen.Domain.Constant
+namespace MeWhenAPI.Domain.Constant
 {
     public static class ModelConstant
     {

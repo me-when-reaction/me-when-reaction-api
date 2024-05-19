@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MeWhen.Domain.Model
+namespace MeWhenAPI.Domain.Model
 {
     [Table("ms_user")]
     public class UserModel : BaseModel

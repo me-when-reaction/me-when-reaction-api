@@ -5,17 +5,17 @@ using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.DTO;
-using MeWhen.Domain.Model;
-using MeWhen.Domain.Validator;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Helper;
-using MeWhen.Infrastructure.Utilities;
-using MeWhen.Service.App.Tag;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.DTO;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Domain.Validator;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Utilities;
+using MeWhenAPI.Service.App.Tag;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace MeWhen.Service.App.Image
+namespace MeWhenAPI.Service.App.Image
 {
     [DataContract]
     public class InsertImageCommand : IRequest<InsertImageCommandResponse>

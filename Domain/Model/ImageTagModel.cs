@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
-namespace MeWhen.Domain.Model
+namespace MeWhenAPI.Domain.Model
 {
     [Table("tr_image_tag")]
     public class ImageTagModel : BaseModel

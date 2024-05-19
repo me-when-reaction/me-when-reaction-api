@@ -4,9 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using FileTypeChecker;
 using FluentValidation;
-using MeWhen.Domain.Constant;
+using MeWhenAPI.Domain.Constant;
 
-namespace MeWhen.Domain.Validator
+namespace MeWhenAPI.Domain.Validator
 {
     public class IFormFileValidator : AbstractValidator<IFormFile>
     {
@@ -18,9 +18,10 @@ namespace MeWhen.Domain.Validator
                 .WithMessage($"File size must be less than {FileConstant.MAX_FILESIZE_UPLOAD / 1024 / 1024} MB. The only allowed filesize is {FileConstant.MAX_FILESIZE_UPLOAD / 1024} KB but below former limit, this app will try to compress the image");
 
             RuleFor(x => x.OpenReadStream())
-                .Must((obj, stream) => {
+                .Must((obj, stream) =>
+                {
                     if (stream.Length == 0 || !FileTypeValidator.IsTypeRecognizable(stream)) return false;
-                    return 
+                    return
                         extension.Contains(FileTypeValidator.GetFileType(stream).Extension)
                         && FileTypeValidator.IsImage(stream)
                         && extension.Contains(Path.GetExtension(obj.FileName)[1..]);

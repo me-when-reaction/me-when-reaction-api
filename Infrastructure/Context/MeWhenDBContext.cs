@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
-using MeWhen.Domain.Model;
+using MeWhenAPI.Domain.Model;
 using Microsoft.EntityFrameworkCore;
 
-namespace MeWhen.Infrastructure.Context
+namespace MeWhenAPI.Infrastructure.Context
 {
     public class MeWhenDBContext(DbContextOptions builder) : DbContext(builder)
     {
@@ -18,7 +18,7 @@ namespace MeWhen.Infrastructure.Context
                 .Where(modType.IsAssignableFrom)
                 .ToList();
 
-            foreach(var m in t[1..])
+            foreach (var m in t[1..])
             {
                 builder.Entity(m).ToTable(m.GetCustomAttribute<TableAttribute>()!.Name);
             }
@@ -26,7 +26,8 @@ namespace MeWhen.Infrastructure.Context
 
         public async Task Transaction(Func<MeWhenDBContext, Task> process)
         {
-            await Database.CreateExecutionStrategy().ExecuteAsync(async () => {
+            await Database.CreateExecutionStrategy().ExecuteAsync(async () =>
+            {
                 var transaction = await Database.BeginTransactionAsync();
                 try
                 {

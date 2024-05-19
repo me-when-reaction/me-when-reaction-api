@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MeWhen.Domain.Configuration
+namespace MeWhenAPI.Domain.Configuration
 {
     public class StorageConfiguration
     {

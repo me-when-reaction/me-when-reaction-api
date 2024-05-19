@@ -4,17 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhen.Domain.Configuration;
-using MeWhen.Domain.Constant;
-using MeWhen.Domain.Model;
-using MeWhen.Infrastructure.Context;
-using MeWhen.Infrastructure.Helper;
-using MeWhen.Infrastructure.Utilities;
+using MeWhenAPI.Domain.Configuration;
+using MeWhenAPI.Domain.Constant;
+using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Infrastructure.Context;
+using MeWhenAPI.Infrastructure.Helper;
+using MeWhenAPI.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
-namespace MeWhen.Service.App.Image
+namespace MeWhenAPI.Service.App.Image
 {
     public class GetImageQuery : IRequest<List<GetImageQueryResponse>>
     {
@@ -41,7 +41,7 @@ namespace MeWhen.Service.App.Image
                 .GreaterThanOrEqualTo(10)
                 .When(x => !_Auth.IsAuthenticated())
                 .WithMessage("No pagination is available only for authenticated users.");
-            
+
             RuleFor(x => x.PageNumber)
                 .GreaterThanOrEqualTo(1);
         }
@@ -61,7 +61,7 @@ namespace MeWhen.Service.App.Image
         public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
         {
             var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
-                _StorageConf.Value.AccessPath : 
+                _StorageConf.Value.AccessPath :
                     _Supabase.Storage
                     .From(_StorageConf.Value.Bucket)
                     .GetPublicUrl("")[..^1];
