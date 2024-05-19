@@ -8,3 +8,7 @@ dotnet ef database update 0
 ```cs
 migrationBuilder.Sql("SET TimeZone='UTC';");
 ```
+
+```bash
+dotnet publish
+```

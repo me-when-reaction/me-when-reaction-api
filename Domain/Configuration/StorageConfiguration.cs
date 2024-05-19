@@ -12,6 +12,7 @@ namespace MeWhen.Domain.Configuration
         public required string Endpoint { get; set; }
         public required string Bucket { get; set; }
         public required string NativePath { get; set; }
+        public required string AccessPath { get; set; }
         public required string StorageType { get; set; }
     }
 }

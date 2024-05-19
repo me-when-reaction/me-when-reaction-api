@@ -1,4 +1,5 @@
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace MeWhen.Infrastructure.Helper
 {
@@ -12,6 +13,12 @@ namespace MeWhen.Infrastructure.Helper
             using var mems = new MemoryStream();
             stream.CopyTo(mems);
             return mems.ToArray();
+        }
+
+        public async static Task<List<T>> Paginate<T>(this IQueryable<T> query, int pageSize, int pageNumber, CancellationToken cancellationToken)
+        {
+            if (pageSize == 0) return await query.ToListAsync(cancellationToken);
+            else return await query.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync(cancellationToken);
         }
     }
 }

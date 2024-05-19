@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using MeWhen.Domain.Configuration;
+using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace MeWhen.Service.App.Image
 {
@@ -23,10 +26,15 @@ namespace MeWhen.Service.App.Image
         public required List<string> Tags { get; set; }
     }
 
-    public class GetRandomImageQueryHandler(MeWhenDBContext _DB) : IRequestHandler<GetRandomImageQuery, List<GetRandomImageQueryResponse>>
+    public class GetRandomImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetRandomImageQuery, List<GetRandomImageQueryResponse>>
     {
         public async Task<List<GetRandomImageQueryResponse>> Handle(GetRandomImageQuery request, CancellationToken cancellationToken)
         {
+            var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
+                _StorageConf.Value.AccessPath : 
+                    _Supabase.Storage
+                    .From(_StorageConf.Value.Bucket)
+                    .GetPublicUrl("")[..^1];
             return await (
                 from image in _DB.Set<ImageModel>().Include(x => x.Tags).ThenInclude(x => x.Tag)
                 orderby image.DateIn descending
@@ -34,7 +42,7 @@ namespace MeWhen.Service.App.Image
                 {
                     ID = image.ID,
                     Name = image.Name,
-                    Link = image.Link,
+                    Link = $"{link}/{image.ID}.{image.Extension}",
                     UploadDate = image.DateIn,
                     Tags = image.Tags.Select(x => x.Tag.Name).ToList()
                 }

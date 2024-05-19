@@ -70,9 +70,10 @@ namespace MeWhen
                 .AddMediatR(config =>
                 {
                     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
-                    builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
+                    
                 });
-
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorNoResponsePipeline<,>));
             builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection("Supabase:Storage"));
             builder.Services.Configure<SupabaseConfiguration>(builder.Configuration.GetSection("Supabase:Service"));
         }

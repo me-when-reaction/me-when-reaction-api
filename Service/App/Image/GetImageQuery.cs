@@ -8,6 +8,7 @@ using MeWhen.Domain.Configuration;
 using MeWhen.Domain.Constant;
 using MeWhen.Domain.Model;
 using MeWhen.Infrastructure.Context;
+using MeWhen.Infrastructure.Helper;
 using MeWhen.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
@@ -60,35 +61,32 @@ namespace MeWhen.Service.App.Image
         public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
         {
             var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
-                _StorageConf.Value.NativePath : 
+                _StorageConf.Value.AccessPath : 
                     _Supabase.Storage
                     .From(_StorageConf.Value.Bucket)
                     .GetPublicUrl("")[..^1];
 
             return await (
-                from i in _DB.Set<ImageModel>()
+                from image in _DB.Set<ImageModel>()
                     .Include(x => x.Tags)
                     .ThenInclude(y => y.Tag)
-                let tags = i.Tags.Select(x => x.Tag.Name)
+                let tags = image.Tags.Select(x => x.Tag.Name)
                 where
                     (request.JoinedTag.Count == 0 ||
                     (
                         (request.TagAND.Count == 0 || request.TagAND.All(x => tags.Any(y => y == x))) &&
                         (request.TagOR.Count == 0 || request.TagOR.Any(x => tags.Any(y => y == x)))
-                    )) && i.AgeRating <= request.AgeRating
-                orderby i.DateIn descending
+                    )) && image.AgeRating <= request.AgeRating
+                orderby image.DateIn descending
                 select new GetImageQueryResponse()
                 {
-                    Name = i.Name,
-                    AgeRating = i.AgeRating,
-                    Link = $"{link}/{i.ID}.{i.Extension}",
-                    Tags = i.Tags.Select(x => x.Tag.Name).ToList(),
-                    UploadDate = i.DateIn
+                    Name = image.Name,
+                    AgeRating = image.AgeRating,
+                    Link = $"{link}/{image.ID}.{image.Extension}",
+                    Tags = image.Tags.Select(x => x.Tag.Name).ToList(),
+                    UploadDate = image.DateIn
                 }
-            )
-            .Skip(request.PageSize * (request.PageNumber - 1))
-            .Take(request.PageSize)
-            .ToListAsync(cancellationToken: cancellationToken);
+            ).Paginate(request.PageSize, request.PageNumber, cancellationToken);
         }
     }
 }
