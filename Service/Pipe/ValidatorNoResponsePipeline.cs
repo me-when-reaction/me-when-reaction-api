@@ -7,8 +7,8 @@ using MediatR;
 
 namespace MeWhen.Service.Pipe
 {
-    public class ValidatorPipeline<TRequest, TResponse>(IValidator<TRequest> Validator) : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+    public class ValidatorNoResponsePipeline<TRequest, TResponse>(IValidator<TRequest> Validator) : IPipelineBehavior<TRequest, TResponse>
+        where TRequest : IRequest
     {
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
