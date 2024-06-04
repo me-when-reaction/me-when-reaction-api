@@ -41,7 +41,7 @@ namespace MeWhenAPI.Service.App.Image
             RuleFor(x => x.Tags).NotEmpty();
             RuleFor(x => x.Name).NotEmpty();
             RuleFor(x => x.Description).NotEmpty();
-            RuleFor(x => x.Image).NotNull().SetValidator(new IFormFileValidator());
+            RuleFor(x => x.Image).NotNull().SetValidator(new FormFileValidator());
         }
     }
 
