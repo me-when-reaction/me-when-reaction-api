@@ -7,6 +7,7 @@ using MediatR;
 using MeWhenAPI.Domain.Configuration;
 using MeWhenAPI.Domain.Constant;
 using MeWhenAPI.Domain.Model;
+using MeWhenAPI.Domain.Validator;
 using MeWhenAPI.Infrastructure.Context;
 using MeWhenAPI.Infrastructure.Helper;
 using MeWhenAPI.Infrastructure.Utilities;
@@ -16,7 +17,7 @@ using Microsoft.Extensions.Options;
 
 namespace MeWhenAPI.Service.App.Image
 {
-    public class GetImageQuery : IRequest<List<GetImageQueryResponse>>
+    public class GetImageQuery : IRequest<PaginationResponse<List<GetImageQueryResponse>>>
     {
         public List<string> TagAND { get; set; } = [];
         public List<string> TagOR { get; set; } = [];
@@ -29,7 +30,7 @@ namespace MeWhenAPI.Service.App.Image
         /// No pagination = 0
         /// </summary>
         public int PageSize { get; set; } = 10;
-        public int PageNumber { get; set; } = 1;
+        public int CurrentPage { get; set; } = 1;
 
     }
 
@@ -37,12 +38,15 @@ namespace MeWhenAPI.Service.App.Image
     {
         public GetImageQueryValidator(IAuthUtilities _Auth)
         {
-            RuleFor(x => x.PageSize)
-                .GreaterThanOrEqualTo(10)
-                .When(x => !_Auth.IsAuthenticated())
-                .WithMessage("No pagination is available only for authenticated users.");
+            // RuleFor(x => x.PageSize)
+            //     .GreaterThanOrEqualTo(0)
+                // .When(x => !_Auth.IsAuthenticated())
+                // .WithMessage("No pagination is available only for authenticated users.");
 
-            RuleFor(x => x.PageNumber)
+            RuleFor(x => x.PageSize)
+                .In([5, 10, 20, 50, 100]);
+
+            RuleFor(x => x.CurrentPage)
                 .GreaterThanOrEqualTo(1);
         }
     }
@@ -56,9 +60,9 @@ namespace MeWhenAPI.Service.App.Image
         public required List<string> Tags { get; set; }
     }
 
-    public class GetImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetImageQuery, List<GetImageQueryResponse>>
+    public class GetImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetImageQuery, PaginationResponse<List<GetImageQueryResponse>>>
     {
-        public async Task<List<GetImageQueryResponse>> Handle(GetImageQuery request, CancellationToken cancellationToken)
+        public async Task<PaginationResponse<List<GetImageQueryResponse>>> Handle(GetImageQuery request, CancellationToken cancellationToken)
         {
             var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
                 _StorageConf.Value.AccessPath :
@@ -66,7 +70,7 @@ namespace MeWhenAPI.Service.App.Image
                     .From(_StorageConf.Value.Bucket)
                     .GetPublicUrl("")[..^1];
 
-            return await (
+            var q = (
                 from image in _DB.Set<ImageModel>()
                     .Include(x => x.Tags)
                     .ThenInclude(y => y.Tag)
@@ -86,7 +90,16 @@ namespace MeWhenAPI.Service.App.Image
                     Tags = image.Tags.Select(x => x.Tag.Name).ToList(),
                     UploadDate = image.DateIn
                 }
-            ).Paginate(request.PageSize, request.PageNumber, cancellationToken);
+            );
+
+            var resp = new PaginationResponse<List<GetImageQueryResponse>>{
+                PageSize = request.PageSize,
+                CurrentPage = request.CurrentPage,
+                TotalPage = ((await q.CountAsync(cancellationToken: cancellationToken)) + request.PageSize - 1) / request.PageSize,
+                Data = await q.Paginate(request.PageSize, request.CurrentPage, cancellationToken)
+            };
+
+            return resp;
         }
     }
 }

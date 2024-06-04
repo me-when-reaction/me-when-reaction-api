@@ -7,6 +7,18 @@
     <PublishIISAssets>true</PublishIISAssets>
     <RootNamespace>MeWhenAPI</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="web.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="web.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="web.config" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Magick.NET-Q16-x64" Version="13.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.4" />

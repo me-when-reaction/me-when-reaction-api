@@ -10,5 +10,5 @@ migrationBuilder.Sql("SET TimeZone='UTC';");
 ```
 
 ```bash
-dotnet publish
+dotnet publish -c Release /p:EnvironmentName=Production
 ```

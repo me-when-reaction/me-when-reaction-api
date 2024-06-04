@@ -8,9 +8,9 @@ using MeWhenAPI.Domain.Constant;
 
 namespace MeWhenAPI.Domain.Validator
 {
-    public class IFormFileValidator : AbstractValidator<IFormFile>
+    public class FormFileValidator : AbstractValidator<IFormFile>
     {
-        public IFormFileValidator()
+        public FormFileValidator()
         {
             var extension = FileConstant.Extension.Select(x => x.Value);
 

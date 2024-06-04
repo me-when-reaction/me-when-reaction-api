@@ -30,7 +30,6 @@ namespace MeWhenAPI
 
             builder.Services.AddControllers()
                 .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
@@ -79,6 +78,16 @@ namespace MeWhenAPI
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorNoResponsePipeline<,>));
             builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection("Supabase:Storage"));
             builder.Services.Configure<SupabaseConfiguration>(builder.Configuration.GetSection("Supabase:Service"));
+            builder.Services.AddCors(opt => {
+                opt.AddPolicy(
+                    name: "Default",
+                    policy => {
+                        policy.AllowAnyHeader()
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod();
+                    }
+                );
+            });
         }
     }
 }
