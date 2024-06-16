@@ -55,6 +55,7 @@ namespace MeWhenAPI.Service.App.Image
     {
         public required string Name { get; set; }
         public required string Link { get; set; }
+        public required string Description { get; set; }
         public required DateTime UploadDate { get; set; }
         public required ModelConstant.AgeRating AgeRating { get; set; }
         public required List<string> Tags { get; set; }
@@ -88,7 +89,8 @@ namespace MeWhenAPI.Service.App.Image
                     AgeRating = image.AgeRating,
                     Link = $"{link}/{image.ID}.{image.Extension}",
                     Tags = image.Tags.Select(x => x.Tag.Name).ToList(),
-                    UploadDate = image.DateIn
+                    UploadDate = image.DateIn,
+                    Description = image.Description
                 }
             );
 
