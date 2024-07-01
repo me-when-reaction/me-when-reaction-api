@@ -29,7 +29,10 @@ namespace MeWhenAPI
             });
 
             builder.Services.AddControllers()
-                .AddJsonOptions(opt => opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+                .AddJsonOptions(opt => {
+                    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                    opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(opt =>
                 {
