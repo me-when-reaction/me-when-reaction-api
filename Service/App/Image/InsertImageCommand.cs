@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace MeWhenAPI.Service.App.Image
 {
-    [DataContract]
     public class InsertImageCommand : IRequest<InsertImageCommandResponse>
     {
         public required string Name { get; set; }
@@ -26,7 +25,6 @@ namespace MeWhenAPI.Service.App.Image
         public required IFormFile Image { get; set; }
         public required List<string> Tags { get; set; } = [];
         public required ModelConstant.AgeRating AgeRating { get; set; }
-        public required bool ConsentCompressed { get; set; }
     }
 
     public class InsertImageCommandResponse(Guid id)
