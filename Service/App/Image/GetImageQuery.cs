@@ -53,8 +53,10 @@ namespace MeWhenAPI.Service.App.Image
 
     public class GetImageQueryResponse
     {
+        public required Guid ID { get; set; }
         public required string Name { get; set; }
-        public required string Link { get; set; }
+        public required string Image { get; set; }
+        public required string Source { get; set; }
         public required string Description { get; set; }
         public required DateTime UploadDate { get; set; }
         public required ModelConstant.AgeRating AgeRating { get; set; }
@@ -85,9 +87,11 @@ namespace MeWhenAPI.Service.App.Image
                 orderby image.DateIn descending
                 select new GetImageQueryResponse()
                 {
+                    ID = image.ID,
                     Name = image.Name,
                     AgeRating = image.AgeRating,
-                    Link = $"{link}/{image.ID}.{image.Extension}",
+                    Source = image.Source,
+                    Image = $"{link}/{image.ID}.{image.Extension}",
                     Tags = image.Tags.Select(x => x.Tag.Name).ToList(),
                     UploadDate = image.DateIn,
                     Description = image.Description

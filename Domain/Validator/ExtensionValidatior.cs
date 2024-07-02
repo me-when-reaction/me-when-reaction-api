@@ -6,7 +6,7 @@ using FluentValidation;
 
 namespace MeWhenAPI.Domain.Validator
 {
-    public static class InValidatior
+    public static class ExtensionValidatior
     {
         public static IRuleBuilderOptions<T, TElement> In<T, TElement>(this IRuleBuilder<T, TElement> ruleBuilder, ICollection<TElement> allowed) =>
             ruleBuilder

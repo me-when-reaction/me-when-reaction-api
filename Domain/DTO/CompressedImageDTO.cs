@@ -40,7 +40,7 @@ namespace MeWhenAPI.Domain.DTO
                 stream.Seek(0, SeekOrigin.Begin);
 
                 if (Content.Length > FileConstant.MAX_FILESIZE_STORAGE)
-                    throw new BadRequestException("Sorry, we cannot compress the image 😞");
+                    throw new BadRequestException($"Sorry, we cannot compress the image down to {FileConstant.MAX_FILESIZE_STORAGE / 1024}KB 😞");
             }
         }
     }
