@@ -32,7 +32,7 @@ namespace MeWhenAPI.Controller
             await Run(async () => Data200(await mediator.Send(data)));
 
         [HttpPatch]
-        public async Task<IActionResult> Insert([FromForm] UpdateImageCommand data) =>
+        public async Task<IActionResult> Update([FromForm] UpdateImageCommand data) =>
             await Run(async () =>
             {
                 await mediator.Send(data);
@@ -40,7 +40,7 @@ namespace MeWhenAPI.Controller
             });
 
         [HttpDelete]
-        public async Task<IActionResult> Insert([FromQuery] DeleteImageCommand data) =>
+        public async Task<IActionResult> Delete([FromQuery] DeleteImageCommand data) =>
             await Run(async () =>
             {
                 await mediator.Send(data);
