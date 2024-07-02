@@ -19,5 +19,13 @@ namespace MeWhenAPI.Controller
                 await mediator.Send(data);
                 return Data200("Successfully update this tag 👍");
             });
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteRating([FromQuery] DeleteTagCommand data) =>
+            await Run(async () =>
+            {
+                await mediator.Send(data);
+                return Data200("Successfully delete this tag 👍");
+            });
     }
 }
