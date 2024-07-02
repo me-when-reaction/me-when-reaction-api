@@ -13,9 +13,9 @@ namespace MeWhenAPI.Domain.Constant
         public const long MAX_FILESIZE_UPLOAD = 1024 * 1024 * 2;
 
         /// <summary>
-        /// Max masuk ke filesystem (20KB). Jika gagal, suruh si uploader yang compress sendiri
+        /// Max masuk ke filesystem (40KB). Jika gagal, suruh si uploader yang compress sendiri
         /// </summary>
-        public const long MAX_FILESIZE_STORAGE = 1024 * 20;
+        public const long MAX_FILESIZE_STORAGE = 1024 * 40;
 
         public enum FileTypeEnum
         {

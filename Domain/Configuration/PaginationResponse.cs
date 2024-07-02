@@ -10,7 +10,7 @@ namespace MeWhenAPI.Domain.Configuration
         public required int TotalPage { get; set; }
         public required int PageSize { get; set; }
         public required int CurrentPage { get; set; }
-        public bool IsLast => TotalPage == CurrentPage;
+        public bool IsLast => TotalPage <= CurrentPage;
         public required TData Data { get; set; }
     }
 }
