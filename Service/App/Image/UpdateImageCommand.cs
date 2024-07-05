@@ -17,18 +17,23 @@ namespace MeWhenAPI.Service.App.Image
     public class UpdateImageCommand : IRequest
     {
         public required Guid ID { get; set; }
-        public string? Name { get; set; }
-        public string? Description { get; set; }
-        public string? Source { get; set; }
-        public List<string>? Tags { get; set; } = [];
-        public ModelConstant.AgeRating? AgeRating { get; set; }
+        public required string Name { get; set; }
+        public required string Description { get; set; }
+        public required string Source { get; set; }
+        public required List<string> Tags { get; set; } = [];
+        public required ModelConstant.AgeRating? AgeRating { get; set; } = ModelConstant.AgeRating.GENERAL;
     }
 
     public class UpdateImageCommandValidator : AbstractValidator<UpdateImageCommand>
     {
         public UpdateImageCommandValidator()
         {
-
+            RuleFor(x => x.ID).NotEmpty();
+            RuleFor(x => x.Tags).NotEmpty();
+            RuleFor(x => x.Name).NotEmpty();
+            RuleFor(x => x.Description).NotEmpty();
+            RuleFor(x => x.Source).NotEmpty();
+            RuleFor(x => x.AgeRating).NotNull();
         }
     }
 
@@ -58,6 +63,8 @@ namespace MeWhenAPI.Service.App.Image
             // Hapus yang nga ada di list
             if (request.Tags != null && request.Tags.Count != 0)
             {
+                request.Tags = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
+
                 // Tag ini bakal dihapus
                 var deletedTag = image.Tags.Where(x => !request.Tags.Contains(x.Tag.Name)).ToList();
 
