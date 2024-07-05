@@ -24,7 +24,7 @@ namespace MeWhenAPI.Service.App.Image
         public required string Source { get; set; }
         public required IFormFile Image { get; set; }
         public required List<string> Tags { get; set; } = [];
-        public required ModelConstant.AgeRating AgeRating { get; set; }
+        public required ModelConstant.AgeRating AgeRating { get; set; } = ModelConstant.AgeRating.GENERAL;
     }
 
     public class InsertImageCommandResponse(Guid id)
@@ -39,6 +39,8 @@ namespace MeWhenAPI.Service.App.Image
             RuleFor(x => x.Tags).NotEmpty();
             RuleFor(x => x.Name).NotEmpty();
             RuleFor(x => x.Description).NotEmpty();
+            RuleFor(x => x.Source).NotEmpty();
+            RuleFor(x => x.AgeRating).NotNull();
             RuleFor(x => x.Image).NotNull().SetValidator(new FormFileValidator());
         }
     }
@@ -68,6 +70,7 @@ namespace MeWhenAPI.Service.App.Image
             };
 
             // Masuk tag yang not exists
+            request.Tags = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
             var tagInDB = _DB.Set<TagModel>()
                 .Where(x => request.Tags.Contains(x.Name))
                 .ToList();
