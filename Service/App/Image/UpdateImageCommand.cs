@@ -21,7 +21,7 @@ namespace MeWhenAPI.Service.App.Image
         public required string Description { get; set; }
         public required string Source { get; set; }
         public required List<string> Tags { get; set; } = [];
-        public required ModelConstant.AgeRating? AgeRating { get; set; } = ModelConstant.AgeRating.GENERAL;
+        public required ModelConstant.AgeRating? AgeRating { get; set; }
     }
 
     public class UpdateImageCommandValidator : AbstractValidator<UpdateImageCommand>
@@ -86,7 +86,6 @@ namespace MeWhenAPI.Service.App.Image
                     })
                     .ToList();
 
-
                 // Insert imagetag baru ini
                 var imageTag = tagInDB.Union(tagNotInDB)
                 .Select(x => new ImageTagModel()
@@ -96,7 +95,6 @@ namespace MeWhenAPI.Service.App.Image
                     TagID = x.ID,
                     UserIn = userID
                 }).ToList();
-
 
                 _DB.AddRange(tagNotInDB);
                 if (deletedTag.Count > 0) _DB.RemoveRange(deletedTag);

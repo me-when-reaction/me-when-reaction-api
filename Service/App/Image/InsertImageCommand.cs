@@ -24,7 +24,7 @@ namespace MeWhenAPI.Service.App.Image
         public required string Source { get; set; }
         public required IFormFile Image { get; set; }
         public required List<string> Tags { get; set; } = [];
-        public required ModelConstant.AgeRating AgeRating { get; set; } = ModelConstant.AgeRating.GENERAL;
+        public required ModelConstant.AgeRating AgeRating { get; set; }
     }
 
     public class InsertImageCommandResponse(Guid id)
