@@ -14,8 +14,8 @@ namespace MeWhenAPI.Domain.Validator
         {
             var extension = FileConstant.Extension.Select(x => x.Value);
 
-            RuleFor(x => x.Length).LessThanOrEqualTo(FileConstant.MAX_FILESIZE_UPLOAD)
-                .WithMessage($"File size must be less than {FileConstant.MAX_FILESIZE_UPLOAD / 1024 / 1024} MB. The only allowed filesize is {FileConstant.MAX_FILESIZE_UPLOAD / 1024} KB but below former limit, this app will try to compress the image");
+            RuleFor(x => x.Length).LessThanOrEqualTo(FileConstant.MAX_FILESIZE_STORAGE)
+                .WithMessage($"File size must be less than {FileConstant.MAX_FILESIZE_STORAGE / 1024} KB,");
 
             RuleFor(x => x.OpenReadStream())
                 .Must((obj, stream) =>
