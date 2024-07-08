@@ -1,9 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using MeWhenAPI.Domain.Configuration;
@@ -11,7 +7,6 @@ using MeWhenAPI.Infrastructure.Context;
 using MeWhenAPI.Infrastructure.Utilities;
 using MeWhenAPI.Service.Pipe;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -50,7 +45,7 @@ namespace MeWhenAPI
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSingleton<Supabase.Client>(x => new(
                     builder.Configuration.GetValue<string>("Supabase:Service:URL")!,
-                    builder.Configuration.GetValue<string>("Supabase:Service:kEY")!,
+                    builder.Configuration.GetValue<string>("Supabase:Service:Key")!,
                     new()
                     {
                         AutoConnectRealtime = true,
