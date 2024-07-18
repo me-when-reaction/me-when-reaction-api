@@ -13,6 +13,9 @@ namespace MeWhenAPI.Domain.Model
         [Column("age_rating")]
         public required ModelConstant.AgeRating AgeRating { get; set; }
 
+        [Column("alias")]
+        public required List<string> Alias { get; set; } = [];
+
         [InverseProperty("Tag")]
         public List<ImageTagModel> TagsUsed { get; set; } = [];
     }

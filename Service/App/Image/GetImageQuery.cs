@@ -1,23 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
 using MeWhenAPI.Domain.Configuration;
 using MeWhenAPI.Domain.Constant;
 using MeWhenAPI.Domain.Model;
-using MeWhenAPI.Domain.Validator;
 using MeWhenAPI.Infrastructure.Context;
 using MeWhenAPI.Infrastructure.Helper;
-using MeWhenAPI.Infrastructure.Utilities;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace MeWhenAPI.Service.App.Image
 {
-    public class GetImageQuery : IRequest<PaginationResponse<List<GetImageQueryResponse>>>
+    public class GetImageQuery : PaginationRequest<PaginationResponse<List<GetImageQueryResponse>>>
     {
         public List<string> TagAND { get; set; } = [];
         public List<string> TagOR { get; set; } = [];
@@ -25,31 +19,9 @@ namespace MeWhenAPI.Service.App.Image
 
         [BindNever]
         public List<string> JoinedTag => TagAND.Union(TagOR).ToList();
-
-        /// <summary>
-        /// No pagination = 0
-        /// </summary>
-        public int PageSize { get; set; } = 10;
-        public int CurrentPage { get; set; } = 1;
-
     }
 
-    public class GetImageQueryValidator : AbstractValidator<GetImageQuery>
-    {
-        public GetImageQueryValidator(IAuthUtilities _Auth)
-        {
-            // RuleFor(x => x.PageSize)
-            //     .GreaterThanOrEqualTo(0)
-                // .When(x => !_Auth.IsAuthenticated())
-                // .WithMessage("No pagination is available only for authenticated users.");
-
-            RuleFor(x => x.PageSize)
-                .In([5, 10, 20, 50, 100]);
-
-            RuleFor(x => x.CurrentPage)
-                .GreaterThanOrEqualTo(1);
-        }
-    }
+    public class GetImageQueryValidator : PaginationRequestValidator<GetImageQuery> { }
 
     public class GetImageQueryResponse
     {
@@ -73,7 +45,7 @@ namespace MeWhenAPI.Service.App.Image
                     .From(_StorageConf.Value.Bucket)
                     .GetPublicUrl("")[..^1];
 
-            var q = (
+            return await (
                 from image in _DB.Set<ImageModel>()
                     .Include(x => x.Tags)
                     .ThenInclude(y => y.Tag)
@@ -96,16 +68,7 @@ namespace MeWhenAPI.Service.App.Image
                     UploadDate = image.DateIn,
                     Description = image.Description
                 }
-            );
-
-            var resp = new PaginationResponse<List<GetImageQueryResponse>>{
-                PageSize = request.PageSize,
-                CurrentPage = request.CurrentPage,
-                TotalPage = ((await q.CountAsync(cancellationToken: cancellationToken)) + request.PageSize - 1) / request.PageSize,
-                Data = await q.Paginate(request.PageSize, request.CurrentPage, cancellationToken)
-            };
-
-            return resp;
+            ).ToPaginationResult(request, cancellationToken);
         }
     }
 }

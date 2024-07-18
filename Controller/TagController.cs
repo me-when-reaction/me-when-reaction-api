@@ -9,9 +9,14 @@ namespace MeWhenAPI.Controller
     [Route("tag")]
     public class TagController(IMediator mediator) : BaseController
     {
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTagManagement([FromQuery] GetTagManagementQuery data) =>
+            await Run(async () => Data200(await mediator.Send(data)));
+
         [HttpGet("search")]
         [AllowAnonymous]
-        public async Task<IActionResult> Get([FromQuery] GetTagSuggestionQuery data) =>
+        public async Task<IActionResult> GetSearch([FromQuery] GetTagSuggestionQuery data) =>
             await Run(async () => Data200(await mediator.Send(data)));
 
         [HttpPatch]

@@ -63,42 +63,86 @@ namespace MeWhenAPI.Service.App.Image
             // Hapus yang nga ada di list
             if (request.Tags != null && request.Tags.Count != 0)
             {
-                request.Tags = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
+                var newTagName = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
+                var oldTag = image.Tags;
 
-                // Tag ini bakal dihapus
-                var deletedTag = image.Tags.Where(x => !request.Tags.Contains(x.Tag.Name)).ToList();
+                // 1 Yang ada di old, gaada di new, maka hapus
+                var deletedTag = oldTag.Where(o => !newTagName.Contains(o.Tag.Name));
+                var deletedTagName = deletedTag.Select(x => x.Tag.Name);
 
-                // Sisa tag yang available
-                var unchangedTag = image.Tags.Where(x => request.Tags.Contains(x.Tag.Name)).Select(x => x.Tag.Name);
-
-                // Cari tag yang ada pada DB dan belum ada pada available
+                // 2 Ini sisanya tag baru yang baru ditambahkan. Logicnya sama harusnya dengan si insert tag di insert image
+                var remainingTag = newTagName.Except(deletedTagName).ToList();
                 var tagInDB = _DB.Set<TagModel>()
-                    .Where(x => request.Tags.Contains(x.Name) && !unchangedTag.Contains(x.Name))
+                    .Where(x => remainingTag.Contains(x.Name))
                     .ToList();
 
-                var tagNotInDB = request.Tags.Where(x => !tagInDB.Select(y => y.Name).Contains(x) && !unchangedTag.Contains(x))
+                // Proses tag yang ada di alias di DB. Ambil di DB tag mana yang alias ada di salah satu tag yang belum diproses
+                // Hasilnya tag yang dikaitin dengan alias akan dianggap punya tag tsb
+                remainingTag = remainingTag.Except(tagInDB.Select(x => x.Name)).ToList();
+                var tagInAlias = _DB.Set<TagModel>()
+                    .Where(x => x.Alias.Intersect(remainingTag).Any())
+                    .ToList();
+
+                // Proses tag yang tidak ada di DB dan tidak ada di alias
+                remainingTag = remainingTag.Except(tagInAlias.Select(x => x.Name)).ToList();
+                var tagNotInDB = remainingTag.Except(tagInDB.Select(x => x.Name))
                     .Select(x => new TagModel()
                     {
                         ID = Guid.NewGuid(),
                         Name = x,
                         AgeRating = ModelConstant.AgeRating.GENERAL,
+                        Alias = [],
                         UserIn = userID
                     })
                     .ToList();
 
-                // Insert imagetag baru ini
-                var imageTag = tagInDB.Union(tagNotInDB)
-                .Select(x => new ImageTagModel()
-                {
-                    ID = Guid.NewGuid(),
-                    ImageID = image.ID,
-                    TagID = x.ID,
-                    UserIn = userID
-                }).ToList();
+                var imageTag = tagInDB.Union(tagInAlias).Union(tagNotInDB)
+                    .Select(x => new ImageTagModel()
+                    {
+                        ID = Guid.NewGuid(),
+                        ImageID = image.ID,
+                        TagID = x.ID,
+                        UserIn = userID
+                    });
 
+                if (deletedTag.Any()) _DB.RemoveRange(deletedTag);
                 _DB.AddRange(tagNotInDB);
-                if (deletedTag.Count > 0) _DB.RemoveRange(deletedTag);
                 _DB.AddRange(imageTag);
+
+                // // Tag ini bakal dihapus
+                // var deletedTag = image.Tags.Where(x => !request.Tags.Contains(x.Tag.Name)).ToList();
+
+                // // Sisa tag yang available
+                // var unchangedTag = image.Tags.Where(x => request.Tags.Contains(x.Tag.Name)).Select(x => x.Tag.Name);
+
+                // // Cari tag yang ada pada DB dan belum ada pada available
+                // var tagInDB = _DB.Set<TagModel>()
+                //     .Where(x => request.Tags.Contains(x.Name) && !unchangedTag.Contains(x.Name))
+                //     .ToList();
+
+                // var tagNotInDB = request.Tags.Where(x => !tagInDB.Select(y => y.Name).Contains(x) && !unchangedTag.Contains(x))
+                //     .Select(x => new TagModel()
+                //     {
+                //         ID = Guid.NewGuid(),
+                //         Name = x,
+                //         AgeRating = ModelConstant.AgeRating.GENERAL,
+                //         UserIn = userID
+                //     })
+                //     .ToList();
+
+                // // Insert imagetag baru ini
+                // var imageTag = tagInDB.Union(tagNotInDB)
+                // .Select(x => new ImageTagModel()
+                // {
+                //     ID = Guid.NewGuid(),
+                //     ImageID = image.ID,
+                //     TagID = x.ID,
+                //     UserIn = userID
+                // }).ToList();
+
+                // _DB.AddRange(tagNotInDB);
+                // if (deletedTag.Count > 0) _DB.RemoveRange(deletedTag);
+                // _DB.AddRange(imageTag);
             }
 
             _DB.Update(image);

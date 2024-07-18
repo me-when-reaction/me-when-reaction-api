@@ -12,3 +12,8 @@ migrationBuilder.Sql("SET TimeZone='UTC';");
 ```bash
 dotnet publish -c Release /p:EnvironmentName=Production
 ```
+
+Bacaan
+```
+https://stackoverflow.com/questions/30730937/c-sharp-fluentvalidation-for-a-hierarchy-of-classes
+```

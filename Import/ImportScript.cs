@@ -69,6 +69,7 @@ namespace MeWhenAPI.Import
                 {
                     ID = row.Cell(1).CachedValue.GetText().ToGUID(),
                     Name = row.Cell(2).CachedValue.GetText(),
+                    Alias = [],
                     AgeRating = row.Cell(3).CachedValue.GetText() switch
                     {
                         "MATURE" => AgeRating.MATURE,

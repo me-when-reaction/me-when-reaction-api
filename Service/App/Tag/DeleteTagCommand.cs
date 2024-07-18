@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using FluentValidation;
 using MediatR;
-using MeWhenAPI.Domain.Constant;
 using MeWhenAPI.Domain.Exception;
 using MeWhenAPI.Domain.Model;
 using MeWhenAPI.Infrastructure.Context;
-using MeWhenAPI.Infrastructure.Helper;
 using MeWhenAPI.Infrastructure.Utilities;
 
 namespace MeWhenAPI.Service.App.Tag
@@ -35,28 +29,34 @@ namespace MeWhenAPI.Service.App.Tag
     {
         public async Task Handle(DeleteTagCommand request, CancellationToken cancellationToken)
         {
-            var el = _DB.Set<TagModel>().FirstOrDefault(x => x.ID == request.ID) ?? throw new BadRequestException("Tag not found");
-            el.DateUp = DateTime.UtcNow;
-            el.Deleted = true;
-            el.UserUp = _Auth.GetUserID();
+            var deletedTag = _DB.Set<TagModel>().FirstOrDefault(x => x.ID == request.ID) ?? throw new BadRequestException("Tag not found");
 
             // Jika ada ID merge, maka gambar yang punya tag ini akan dipindahkan ke tag lain
             // Tidak perlu migrate kl dia udah ada tag merge
             if (request.MergeTagID.HasValue)
             {
-                var hasNewTag = _DB.Set<ImageTagModel>().IsNotDeletedAnd(x => x.TagID == request.MergeTagID).Select(x => x.ImageID);
-                var tagMap = _DB.Set<ImageTagModel>().IsNotDeletedAnd(
-                    x => hasNewTag.Contains(x.ImageID) && x.TagID == request.MergeTagID
-                ).ToList();
+                var mergeTag = _DB.Set<TagModel>().FirstOrDefault(x => x.ID == request.MergeTagID.Value) ?? throw new BadRequestException("Merge tag ID not found");
+                mergeTag.Alias.Add(deletedTag.Name);
+
+                // Gambar ini punya tag yang merged
+                var hasMergeTag = _DB.Set<ImageTagModel>().IsNotDeletedAnd(x => x.TagID == request.MergeTagID).Select(x => x.ImageID);
+                
+                // Gambar ini hanya punya tag yang deleted. Pindahkan
+                var tagMap = _DB.Set<ImageTagModel>()
+                    .IsNotDeletedAnd(x => !hasMergeTag.Contains(x.ImageID) && x.TagID == request.ID)
+                    .ToList();
+
                 foreach(var t in tagMap) {
                     t.DateUp = DateTime.UtcNow;
                     t.UserUp = _Auth.GetUserID();
                     t.TagID = request.MergeTagID.Value;
                 }
                 _DB.Update(tagMap);
+                _DB.Update(mergeTag);
             }
 
-            _DB.Update(el);
+            // Hapus tag yang mau didelete beserta dependancynya
+            _DB.Remove(deletedTag);
             await _DB.SaveChangesAsync(cancellationToken);
         }
     }

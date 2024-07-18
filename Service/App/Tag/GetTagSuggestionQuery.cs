@@ -9,7 +9,17 @@ namespace MeWhenAPI.Service.App.Tag
 {
     public class GetTagSuggestionQuery : IRequest<List<GetTagSuggestionResponse>>
     {
+        /// <summary>
+        /// Query yang paling terakhir
+        /// </summary>
+        /// <value></value>
         public string Query { get; set; } = "";
+
+        /// <summary>
+        /// Query yang belakang2 yang udah diketikkin
+        /// </summary>
+        /// <value></value>
+        public List<string> ExistingQuery { get; set; } = [];
     }
 
     public class GetTagSuggestionQueryValidator : AbstractValidator<GetTagSuggestionQuery>
@@ -34,7 +44,8 @@ namespace MeWhenAPI.Service.App.Tag
                     .Include(x => x.TagsUsed)
                 where
                     !string.IsNullOrWhiteSpace(request.Query) &&
-                    tag.Name.Contains(request.Query)
+                    tag.Name.Contains(request.Query) &&
+                    !request.ExistingQuery.Contains(tag.Name)
                 select new GetTagSuggestionResponse()
                 {
                     Name = tag.Name,
