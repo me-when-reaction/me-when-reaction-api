@@ -1,4 +1,5 @@
 using System;
+using FluentValidation;
 using MediatR;
 using MeWhenAPI.Domain.Model;
 using MeWhenAPI.Infrastructure.Context;
@@ -9,6 +10,13 @@ namespace MeWhenAPI.Service.App.Tag
     public class GetTagSuggestionQuery : IRequest<List<GetTagSuggestionResponse>>
     {
         public string Query { get; set; } = "";
+    }
+
+    public class GetTagSuggestionQueryValidator : AbstractValidator<GetTagSuggestionQuery>
+    {
+        public GetTagSuggestionQueryValidator()
+        {
+        }
     }
 
     public class GetTagSuggestionResponse
@@ -34,6 +42,9 @@ namespace MeWhenAPI.Service.App.Tag
                 }
             )
             .OrderByDescending(x => x.Count)
+            .ThenBy(x => x.Name.Length)
+            .ThenBy(x => x.Name)
+            .Take(7)
             .ToListAsync(cancellationToken: cancellationToken);
     }
 }
