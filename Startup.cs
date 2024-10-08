@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json.Serialization;
 using FluentValidation;
 using MediatR;
 using MeWhenAPI.Domain.Configuration;
@@ -25,7 +24,6 @@ namespace MeWhenAPI
 
             builder.Services.AddControllers()
                 .AddJsonOptions(opt => {
-                    opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                     opt.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
                 });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
