@@ -36,7 +36,7 @@ namespace MeWhenAPI.Service.App.Image
 
     public class GetImageQueryValidator : AbstractValidator<GetImageQuery>
     {
-        public GetImageQueryValidator(IAuthUtilities _Auth)
+        public GetImageQueryValidator()
         {
             // RuleFor(x => x.PageSize)
             //     .GreaterThanOrEqualTo(0)
@@ -44,7 +44,7 @@ namespace MeWhenAPI.Service.App.Image
                 // .WithMessage("No pagination is available only for authenticated users.");
 
             RuleFor(x => x.PageSize)
-                .In([5, 10, 20, 50, 100]);
+                .In([10, 25, 50, 100]);
 
             RuleFor(x => x.CurrentPage)
                 .GreaterThanOrEqualTo(1);
