@@ -18,8 +18,7 @@ namespace MeWhenAPI
         {
             builder.Services.AddDbContext<MeWhenDBContext>(opt =>
             {
-                opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
-                    .EnableSensitiveDataLogging(true);
+                opt.UseNpgsql(builder.Configuration.GetConnectionString("Default"));
             });
 
             builder.Services.AddControllers()
