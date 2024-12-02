@@ -69,23 +69,33 @@ namespace MeWhenAPI.Service.App.Image
                 UserIn = userID
             };
 
-            // Masuk tag yang not exists
-            request.Tags = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
+            // Proses tag yang ada dilisting di DB
+            var tagsProcessed = request.Tags.Select(x => x.Replace(' ', '_')).ToList(); 
             var tagInDB = _DB.Set<TagModel>()
-                .Where(x => request.Tags.Contains(x.Name))
+                .Where(x => tagsProcessed.Contains(x.Name))
                 .ToList();
 
-            var tagNotInDB = request.Tags.Except(tagInDB.Select(x => x.Name))
+            // Proses tag yang ada di alias di DB. Ambil di DB tag mana yang alias ada di salah satu tag yang belum diproses
+            // Hasilnya tag yang dikaitin dengan alias akan dianggap punya tag tsb
+            tagsProcessed = tagsProcessed.Except(tagInDB.Select(x => x.Name)).ToList();
+            var tagInAlias = _DB.Set<TagModel>()
+                .Where(x => x.Alias.Intersect(tagsProcessed).Any())
+                .ToList();
+
+            // Proses tag yang tidak ada di DB dan tidak ada di alias
+            tagsProcessed = tagsProcessed.Except(tagInAlias.Select(x => x.Name)).ToList();
+            var tagNotInDB = tagsProcessed.Except(tagInDB.Select(x => x.Name))
                 .Select(x => new TagModel()
                 {
                     ID = Guid.NewGuid(),
                     Name = x,
                     AgeRating = ModelConstant.AgeRating.GENERAL,
+                    Alias = [],
                     UserIn = userID
                 })
                 .ToList();
 
-            var imageTag = tagInDB.Union(tagNotInDB)
+            var imageTag = tagInDB.Union(tagInAlias).Union(tagNotInDB)
                 .Select(x => new ImageTagModel()
                 {
                     ID = Guid.NewGuid(),

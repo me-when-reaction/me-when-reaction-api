@@ -1,4 +1,5 @@
 using System;
+using MeWhenAPI.Domain.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 namespace MeWhenAPI.Infrastructure.Helper
@@ -16,10 +17,23 @@ namespace MeWhenAPI.Infrastructure.Helper
             return mems.ToArray();
         }
 
-        public async static Task<List<T>> Paginate<T>(this IQueryable<T> query, int pageSize, int pageNumber, CancellationToken cancellationToken)
+        public async static Task<List<T>> Paginate<T, U>(this IQueryable<T> query, U request, CancellationToken cancellationToken)
+            where U : PaginationRequestPlain
         {
-            if (pageSize == 0) return await query.ToListAsync(cancellationToken);
-            else return await query.Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync(cancellationToken);
+            if (request.PageSize == 0) return await query.ToListAsync(cancellationToken);
+            else return await query.Skip(request.PageSize * (request.CurrentPage - 1)).Take(request.PageSize).ToListAsync(cancellationToken);
+        }
+
+        public async static Task<PaginationResponse<List<T>>> ToPaginationResult<T, U>(this IQueryable<T> query, U request, CancellationToken cancellationToken)
+            where U : PaginationRequestPlain
+        {
+            return new()
+            {
+                PageSize = request.PageSize,
+                CurrentPage = request.CurrentPage,
+                TotalPage = ((await query.CountAsync(cancellationToken)) + request.PageSize - 1) / request.PageSize,
+                Data = await query.Paginate(request, cancellationToken)
+            };
         }
     }
 }

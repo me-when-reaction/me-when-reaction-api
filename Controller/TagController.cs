@@ -1,6 +1,7 @@
 using System;
 using MediatR;
 using MeWhenAPI.Service.App.Tag;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MeWhenAPI.Controller
@@ -8,8 +9,14 @@ namespace MeWhenAPI.Controller
     [Route("tag")]
     public class TagController(IMediator mediator) : BaseController
     {
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTagManagement([FromQuery] GetTagManagementQuery data) =>
+            await Run(async () => Data200(await mediator.Send(data)));
+
         [HttpGet("search")]
-        public async Task<IActionResult> Get([FromQuery] GetTagSuggestionQuery data) =>
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSearch([FromQuery] GetTagSuggestionQuery data) =>
             await Run(async () => Data200(await mediator.Send(data)));
 
         [HttpPatch]
