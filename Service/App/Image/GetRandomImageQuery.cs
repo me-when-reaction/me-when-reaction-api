@@ -46,6 +46,7 @@ namespace MeWhenAPI.Service.App.Image
                     .GetPublicUrl("")[..^1];
             return await (
                 from image in _DB.Set<ImageModel>().Include(x => x.Tags).ThenInclude(x => x.Tag)
+                where image.AgeRating <= request.AgeRating
                 orderby image.DateIn descending
                 select new GetRandomImageQueryResponse()
                 {
