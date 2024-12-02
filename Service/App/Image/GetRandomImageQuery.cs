@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using FluentValidation;
 using MediatR;
 using MeWhenAPI.Domain.Configuration;
 using MeWhenAPI.Domain.Constant;
@@ -12,9 +13,17 @@ using Microsoft.Extensions.Options;
 
 namespace MeWhenAPI.Service.App.Image
 {
-    public class GetRandomImageQuery : IRequest<List<GetRandomImageQueryResponse>>
+    public class GetRandomImageQuery : IRequest<GetRandomImageQueryResponse?>
     {
-        public int Amount { get; set; } = 10;
+        public ModelConstant.AgeRating AgeRating { get; set; } = ModelConstant.AgeRating.GENERAL;
+    }
+
+    public class GetRandomImageQueryValidator : AbstractValidator<GetRandomImageQuery>
+    {
+        public GetRandomImageQueryValidator()
+        {
+            RuleFor(x => x.AgeRating).IsInEnum();
+        }
     }
 
     public class GetRandomImageQueryResponse
@@ -26,9 +35,9 @@ namespace MeWhenAPI.Service.App.Image
         public required List<string> Tags { get; set; }
     }
 
-    public class GetRandomImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetRandomImageQuery, List<GetRandomImageQueryResponse>>
+    public class GetRandomImageQueryHandler(MeWhenDBContext _DB, IOptions<StorageConfiguration> _StorageConf, Supabase.Client _Supabase) : IRequestHandler<GetRandomImageQuery, GetRandomImageQueryResponse?>
     {
-        public async Task<List<GetRandomImageQueryResponse>> Handle(GetRandomImageQuery request, CancellationToken cancellationToken)
+        public async Task<GetRandomImageQueryResponse?> Handle(GetRandomImageQuery request, CancellationToken cancellationToken)
         {
             var link = (_StorageConf.Value.StorageType == FileConstant.StorageType.Native) ?
                 _StorageConf.Value.AccessPath :
@@ -47,8 +56,8 @@ namespace MeWhenAPI.Service.App.Image
                     Tags = image.Tags.Select(x => x.Tag.Name).ToList()
                 }
             )
-            .Take(request.Amount)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .OrderBy(x => Guid.NewGuid())
+            .FirstOrDefaultAsync(cancellationToken: cancellationToken);
         }
     }
 }
