@@ -11,28 +11,24 @@ namespace MeWhenAPI.Controller
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetTagManagement([FromQuery] GetTagManagementQuery data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> GetTagManagement([FromQuery] GetTagManagementQuery data) => Data200(await mediator.Send(data));
 
         [HttpGet("search")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetSearch([FromQuery] GetTagSuggestionQuery data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> GetSearch([FromQuery] GetTagSuggestionQuery data) => Data200(await mediator.Send(data));
 
         [HttpPatch]
-        public async Task<IActionResult> UpdateRating([FromForm] UpdateTagRatingCommand data) =>
-            await Run(async () =>
-            {
-                await mediator.Send(data);
-                return Data200("Successfully update this tag 👍");
-            });
+        public async Task<IActionResult> UpdateRating([FromForm] UpdateTagRatingCommand data)
+        {
+            await mediator.Send(data);
+            return Data200("Successfully update this tag 👍");
+        }
 
         [HttpDelete]
-        public async Task<IActionResult> DeleteRating([FromQuery] DeleteTagCommand data) =>
-            await Run(async () =>
-            {
-                await mediator.Send(data);
-                return Data200("Successfully delete this tag 👍");
-            });
+        public async Task<IActionResult> DeleteRating([FromQuery] DeleteTagCommand data)
+        {
+            await mediator.Send(data);
+            return Data200("Successfully delete this tag 👍");
+        }
     }
 }

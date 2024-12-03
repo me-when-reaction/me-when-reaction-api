@@ -10,6 +10,6 @@ namespace MeWhenAPI.Domain.DTO
         public DateTime MessageDate { get; set; } = DateTime.UtcNow;
         public required int StatusCode { get; set; }
         public required string Message { get; set; }
-        public required object Data { get; set; }
+        public required object? Data { get; set; }
     }
 }

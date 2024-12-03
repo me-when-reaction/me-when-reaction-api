@@ -13,11 +13,11 @@ namespace MeWhenAPI.Controller
     public class BaseController : ControllerBase
     {
         [NonAction]
-        public IActionResult Data200(object obj) => Ok(new BaseMessageDTO()
+        public IActionResult Data200(object? obj) => Ok(new BaseMessageDTO()
         {
             Data = obj,
-            StatusCode = StatusCodes.Status200OK,
-            Message = "Successfully execute an operation 👍"
+            Message = "Successfully execute an operation 👍",
+            StatusCode = StatusCodes.Status200OK
         });
 
         [NonAction]
@@ -27,42 +27,5 @@ namespace MeWhenAPI.Controller
             Message = "Successfully insert new data 📜",
             StatusCode = StatusCodes.Status201Created
         });
-
-        [NonAction]
-        public IActionResult ServerError500(Exception e) => StatusCode(StatusCodes.Status500InternalServerError, new BaseMessageDTO()
-        {
-            Data = e.Message,
-            Message = "Oops, something went wrong with the server 😔",
-            StatusCode = StatusCodes.Status400BadRequest
-        });
-
-        [NonAction]
-        public IActionResult BadRequest400(object o) => StatusCode(StatusCodes.Status400BadRequest, new BaseMessageDTO()
-        {
-            Data = o,
-            Message = "Is there something wrong with your request? Check again 🤔",
-            StatusCode = StatusCodes.Status400BadRequest
-        });
-
-        [NonAction]
-        public async Task<IActionResult> Run(Func<Task<IActionResult>> process)
-        {
-            try
-            {
-                return await process();
-            }
-            catch (BadRequestException e)
-            {
-                return BadRequest400(e.Message);
-            }
-            catch (ValidationException e)
-            {
-                return BadRequest400(e.Errors.Select(x => x.ErrorMessage).ToList());
-            }
-            catch (Exception ex)
-            {
-                return ServerError500(ex);
-            }
-        }
     }
 }

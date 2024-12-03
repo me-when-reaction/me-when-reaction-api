@@ -53,6 +53,7 @@ namespace MeWhenAPI
 
             builder.Services.AddScoped<IAuthUtilities, AuthUtilities>();
             builder.Services.AddScoped<IFileUtilities, FileUtilities>();
+            builder.Services.AddScoped<ExceptionMiddleware>();
 
             builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly)
                 .AddEndpointsApiExplorer()
