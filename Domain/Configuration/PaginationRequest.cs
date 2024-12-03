@@ -21,7 +21,7 @@ namespace MeWhenAPI.Domain.Configuration
     {
         public PaginationRequestValidator()
         {
-            RuleFor(x => x.PageSize).In([5, 10, 20, 25, 50, 100]);
+            RuleFor(x => x.PageSize).In([5, 10, 20, 50, 100]);
             RuleFor(x => x.CurrentPage).GreaterThanOrEqualTo(1);
         }
     }

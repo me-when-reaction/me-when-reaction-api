@@ -95,10 +95,12 @@ namespace MeWhenAPI
                 {
                     config.RegisterServicesFromAssembly(typeof(Program).Assembly);
                 });
+
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorPipeline<,>));
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidatorNoResponsePipeline<,>));
             builder.Services.Configure<StorageConfiguration>(builder.Configuration.GetSection("Supabase:Storage"));
             builder.Services.Configure<SupabaseConfiguration>(builder.Configuration.GetSection("Supabase:Service"));
+            builder.Services.Configure<ImageConfiguration>(builder.Configuration.GetSection("Image"));
             builder.Services.AddCors(opt => {
                 opt.AddPolicy(
                     name: "Default",
