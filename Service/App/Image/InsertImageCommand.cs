@@ -70,21 +70,21 @@ namespace MeWhenAPI.Service.App.Image
             };
 
             // Proses tag yang ada dilisting di DB
-            var tagsProcessed = request.Tags.Select(x => x.Replace(' ', '_')).ToList(); 
+            var remainingTag = request.Tags.Select(x => x.Replace(' ', '_')).ToList(); 
             var tagInDB = _DB.Set<TagModel>()
-                .Where(x => tagsProcessed.Contains(x.Name))
+                .Where(x => remainingTag.Contains(x.Name))
                 .ToList();
 
             // Proses tag yang ada di alias di DB. Ambil di DB tag mana yang alias ada di salah satu tag yang belum diproses
             // Hasilnya tag yang dikaitin dengan alias akan dianggap punya tag tsb
-            tagsProcessed = tagsProcessed.Except(tagInDB.Select(x => x.Name)).ToList();
+            remainingTag = remainingTag.Except(tagInDB.Select(x => x.Name)).ToList();
             var tagInAlias = _DB.Set<TagModel>()
-                .Where(x => x.Alias.Intersect(tagsProcessed).Any())
+                .Where(x => x.Alias.Intersect(remainingTag).Any())
                 .ToList();
 
             // Proses tag yang tidak ada di DB dan tidak ada di alias
-            tagsProcessed = tagsProcessed.Except(tagInAlias.Select(x => x.Name)).ToList();
-            var tagNotInDB = tagsProcessed.Except(tagInDB.Select(x => x.Name))
+            remainingTag = remainingTag.Except(tagInAlias.Select(x => x.Name)).ToList();
+            var tagNotInDB = remainingTag.Except(tagInDB.Select(x => x.Name))
                 .Select(x => new TagModel()
                 {
                     ID = Guid.NewGuid(),

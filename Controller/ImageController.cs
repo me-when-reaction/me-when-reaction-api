@@ -14,37 +14,31 @@ namespace MeWhenAPI.Controller
     {
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Get([FromQuery] GetImageQuery data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> Get([FromQuery] GetImageQuery data) => Data200(await mediator.Send(data));
 
         [HttpGet("{ID}")]
         [AllowAnonymous]
-        public async Task<IActionResult> Get([FromRoute] GetImageByIDQuery data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> Get([FromRoute] GetImageByIDQuery data) => Data200(await mediator.Send(data));
 
         [HttpGet("random")]
         [AllowAnonymous]
-        public async Task<IActionResult> Get([FromQuery] GetRandomImageQuery data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> Get([FromQuery] GetRandomImageQuery data) => Data200(await mediator.Send(data));
 
         [HttpPost]
-        public async Task<IActionResult> Insert([FromForm] InsertImageCommand data) =>
-            await Run(async () => Data200(await mediator.Send(data)));
+        public async Task<IActionResult> Insert([FromForm] InsertImageCommand data) => Created201(await mediator.Send(data));
 
         [HttpPatch]
-        public async Task<IActionResult> Update([FromForm] UpdateImageCommand data) =>
-            await Run(async () =>
-            {
-                await mediator.Send(data);
-                return Data200("Successfuly update data");
-            });
+        public async Task<IActionResult> Update([FromForm] UpdateImageCommand data)
+        {
+            await mediator.Send(data);
+            return Data200("Successfuly update data");
+        }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromQuery] DeleteImageCommand data) =>
-            await Run(async () =>
-            {
-                await mediator.Send(data);
-                return Data200("Successfully delete data");
-            });
+        public async Task<IActionResult> Delete([FromQuery] DeleteImageCommand data)
+        {
+            await mediator.Send(data);
+            return Data200("Successfully delete data");
+        }
     }
 }

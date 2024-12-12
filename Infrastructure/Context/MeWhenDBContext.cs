@@ -22,6 +22,14 @@ namespace MeWhenAPI.Infrastructure.Context
             {
                 builder.Entity(m).ToTable(m.GetCustomAttribute<TableAttribute>()!.Name);
             }
+
+            // Custom
+            builder.Entity<TagModel>()
+                .HasIndex(x => x.Name)
+                .IncludeProperties(x => new { x.ID, x.AgeRating, x.Alias });
+            builder.Entity<TagModel>()
+                .Property(x => x.Alias)
+                .HasDefaultValue(new List<string>());
         }
 
         public async Task Transaction(Func<MeWhenDBContext, Task> process)

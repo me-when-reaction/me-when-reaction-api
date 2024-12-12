@@ -65,25 +65,33 @@ namespace MeWhenAPI.Service.App.Image
             {
                 var newTagName = request.Tags.Select(x => x.Replace(' ', '_')).ToList();
                 var oldTag = image.Tags;
+                var oldTagName = image.Tags.Select(x => x.Tag.Name);
 
-                // 1 Yang ada di old, gaada di new, maka hapus
+                // 1 Yang ada di old, gaada di new, maka hapus, artinya tag dicabut dari gambar
                 var deletedTag = oldTag.Where(o => !newTagName.Contains(o.Tag.Name));
                 var deletedTagName = deletedTag.Select(x => x.Tag.Name);
 
-                // 2 Ini sisanya tag baru yang baru ditambahkan. Logicnya sama harusnya dengan si insert tag di insert image
-                var remainingTag = newTagName.Except(deletedTagName).ToList();
+                // 2 Yang tag deleted udah dihandle, sekarang yang masih exist di old dan new kita exclude dulu ya
+                var remainingTag = newTagName.Except(deletedTagName).Except(oldTagName).ToList();
+
+                // 3 Tag yang hilang di newTag dan sama percis dengan yang di old sudah diexclude
+                // Kasusnya di remainingTag HANYA ada tag yang baru
+                // Kita mau cek apa ada tag yang baru ini yang ada di DB
+                // tagInDB = tag new yang udah ada di DB
                 var tagInDB = _DB.Set<TagModel>()
                     .Where(x => remainingTag.Contains(x.Name))
                     .ToList();
 
-                // Proses tag yang ada di alias di DB. Ambil di DB tag mana yang alias ada di salah satu tag yang belum diproses
-                // Hasilnya tag yang dikaitin dengan alias akan dianggap punya tag tsb
+                // 4 Oke, sekarang mungkin ada tag yang nga ada di DB
+                // Tapi bisa aja itu tag hanya sebuah alias
+                // Kita cari tag yang ada di alias
                 remainingTag = remainingTag.Except(tagInDB.Select(x => x.Name)).ToList();
                 var tagInAlias = _DB.Set<TagModel>()
                     .Where(x => x.Alias.Intersect(remainingTag).Any())
                     .ToList();
 
-                // Proses tag yang tidak ada di DB dan tidak ada di alias
+                // 5 Jika sampai sini remainingTag masih ada, maka berarti ini tag benar2 baru
+                // Bikin tag baru
                 remainingTag = remainingTag.Except(tagInAlias.Select(x => x.Name)).ToList();
                 var tagNotInDB = remainingTag.Except(tagInDB.Select(x => x.Name))
                     .Select(x => new TagModel()
@@ -96,6 +104,7 @@ namespace MeWhenAPI.Service.App.Image
                     })
                     .ToList();
 
+                // Insert tag yang new2
                 var imageTag = tagInDB.Union(tagInAlias).Union(tagNotInDB)
                     .Select(x => new ImageTagModel()
                     {
@@ -108,41 +117,6 @@ namespace MeWhenAPI.Service.App.Image
                 if (deletedTag.Any()) _DB.RemoveRange(deletedTag);
                 _DB.AddRange(tagNotInDB);
                 _DB.AddRange(imageTag);
-
-                // // Tag ini bakal dihapus
-                // var deletedTag = image.Tags.Where(x => !request.Tags.Contains(x.Tag.Name)).ToList();
-
-                // // Sisa tag yang available
-                // var unchangedTag = image.Tags.Where(x => request.Tags.Contains(x.Tag.Name)).Select(x => x.Tag.Name);
-
-                // // Cari tag yang ada pada DB dan belum ada pada available
-                // var tagInDB = _DB.Set<TagModel>()
-                //     .Where(x => request.Tags.Contains(x.Name) && !unchangedTag.Contains(x.Name))
-                //     .ToList();
-
-                // var tagNotInDB = request.Tags.Where(x => !tagInDB.Select(y => y.Name).Contains(x) && !unchangedTag.Contains(x))
-                //     .Select(x => new TagModel()
-                //     {
-                //         ID = Guid.NewGuid(),
-                //         Name = x,
-                //         AgeRating = ModelConstant.AgeRating.GENERAL,
-                //         UserIn = userID
-                //     })
-                //     .ToList();
-
-                // // Insert imagetag baru ini
-                // var imageTag = tagInDB.Union(tagNotInDB)
-                // .Select(x => new ImageTagModel()
-                // {
-                //     ID = Guid.NewGuid(),
-                //     ImageID = image.ID,
-                //     TagID = x.ID,
-                //     UserIn = userID
-                // }).ToList();
-
-                // _DB.AddRange(tagNotInDB);
-                // if (deletedTag.Count > 0) _DB.RemoveRange(deletedTag);
-                // _DB.AddRange(imageTag);
             }
 
             _DB.Update(image);
